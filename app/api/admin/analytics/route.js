@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
+import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import User from "@/models/User";
 import { auth } from "@clerk/nextjs/server";
