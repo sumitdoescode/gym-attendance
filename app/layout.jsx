@@ -42,12 +42,12 @@ export default function RootLayout({ children }) {
                     }}
                 >
                     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-                        <SidebarProvider>
-                            <AppSidebar />
-                            <SidebarTrigger />
-                            {children}
-                            <Toaster />
-                        </SidebarProvider>
+                        {/* <SidebarProvider> */}
+                        {/* <AppSidebar /> */}
+                        {/* <SidebarTrigger /> */}
+                        {children}
+                        <Toaster />
+                        {/* </SidebarProvider> */}
                     </ThemeProvider>
                 </ClerkProvider>
             </body>
