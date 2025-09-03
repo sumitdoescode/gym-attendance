@@ -5,7 +5,6 @@ import { auth } from "@clerk/nextjs/server";
 import { isValidObjectId } from "mongoose";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
-
 // api/user => GET
 // get own user profile + attendance history (dashboard)
 export const GET = async (request) => {
@@ -24,44 +23,45 @@ export const GET = async (request) => {
 
         // 🚨 Block incomplete profiles
         if (!user.isProfileComplete) {
-            return NextResponse.json({ success: false, message: "Profile is not complete" }, { status: 400 });
+            return NextResponse.json({ success: false, message: "Profile is not complete", data: { isProfileComplete: user.isProfileComplete } }, { status: 400 });
         }
 
         // ✅ fetch last 50 attendances (newest first)
         const attendances = await Attendance.find({ userId: user._id }).sort({ createdAt: -1 }).limit(50).lean();
 
-        let history = [];
-        if (attendances.length) {
-            // map for quick lookup
-            const attendanceMap = {};
-            attendances.forEach((a) => {
-                const dateStr = new Date(a.createdAt).toISOString().split("T")[0]; // YYYY-MM-DD
-                attendanceMap[dateStr] = {
-                    _id: a._id,
-                    time: new Date(a.createdAt).toISOString().split("T")[1].split(".")[0],
-                };
-            });
+        const history = attendances.map((a) => {
+            const d = new Date(a.createdAt);
+            const dateStr = d.toISOString().split("T")[0]; // YYYY-MM-DD
 
-            // earliest date among attendances
-            const earliestDate = new Date(attendances[attendances.length - 1].createdAt);
-
-            // build hybrid history (from today → earliest attendance OR max 50 days)
+            // figure out today/yesterday
             const today = new Date();
-            for (let i = 0; i < 50; i++) {
-                const d = new Date();
-                d.setDate(today.getDate() - i);
+            today.setHours(0, 0, 0, 0);
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
 
-                if (d < earliestDate) break;
-
-                const dateStr = d.toISOString().split("T")[0];
-                history.push({
-                    date: dateStr,
-                    day: d.toLocaleDateString("en-US", { weekday: "long" }),
-                    present: attendanceMap[dateStr] ? true : false,
-                    ...(attendanceMap[dateStr] || {}),
-                });
+            let formattedDate;
+            if (d >= today) {
+                formattedDate = "Today";
+            } else if (d >= yesterday) {
+                formattedDate = "Yesterday";
+            } else {
+                formattedDate = d.toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                }); // e.g. September 2
             }
-        }
+
+            return {
+                _id: a._id,
+                date: formattedDate,
+                day: d.toLocaleDateString("en-US", { weekday: "long" }),
+                time: d.toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                }),
+            };
+        });
 
         return NextResponse.json(
             {
@@ -69,7 +69,7 @@ export const GET = async (request) => {
                 data: {
                     user: {
                         ...user,
-                        attendanceHistory: history, // ✅ we only keep history
+                        attendanceHistory: history,
                         // user.stats already has totalAttendance, thisMonthAttendance, streak
                     },
                 },

@@ -40,12 +40,18 @@ export const GET = async (request, { params }) => {
                 const dateStr = new Date(a.createdAt).toISOString().split("T")[0];
                 attendanceMap[dateStr] = {
                     _id: a._id,
-                    time: new Date(a.createdAt).toISOString().split("T")[1].split(".")[0],
+                    time: new Date(a.createdAt).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                    }),
                 };
             });
 
             const earliestDate = new Date(attendances[attendances.length - 1].createdAt);
             const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
 
             for (let i = 0; i < 50; i++) {
                 const d = new Date();
@@ -54,12 +60,27 @@ export const GET = async (request, { params }) => {
                 if (d < earliestDate) break;
 
                 const dateStr = d.toISOString().split("T")[0];
-                history.push({
-                    date: dateStr,
-                    day: d.toLocaleDateString("en-US", { weekday: "long" }),
-                    present: attendanceMap[dateStr] ? true : false,
-                    ...(attendanceMap[dateStr] || {}),
-                });
+
+                let formattedDate;
+                if (d.toDateString() === today.toDateString()) {
+                    formattedDate = "Today";
+                } else if (d.toDateString() === yesterday.toDateString()) {
+                    formattedDate = "Yesterday";
+                } else {
+                    const opts = { month: "long", day: "numeric" };
+                    if (d.getFullYear() !== today.getFullYear()) {
+                        opts.year = "numeric";
+                    }
+                    formattedDate = d.toLocaleDateString("en-US", opts);
+                }
+
+                if (attendanceMap[dateStr]) {
+                    history.push({
+                        date: formattedDate,
+                        day: d.toLocaleDateString("en-US", { weekday: "long" }),
+                        ...attendanceMap[dateStr],
+                    });
+                }
             }
         }
 

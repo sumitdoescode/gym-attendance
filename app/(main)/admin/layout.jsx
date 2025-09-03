@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/Loading";
 
 const layout = ({ children }) => {
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
@@ -18,11 +20,16 @@ const layout = ({ children }) => {
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
         fetchUserData();
     }, []);
+    if (loading) {
+        return <Loading />;
+    }
     return <>{children}</>;
 };
 

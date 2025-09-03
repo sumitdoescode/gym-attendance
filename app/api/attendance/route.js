@@ -134,26 +134,26 @@ export const POST = async (request) => {
     }
 };
 
+// attendance feed
 // api/attendance => GET
-// get all attendaces aka attendance feed
 export const GET = async (request) => {
     try {
         await connectDB();
 
-        // doesn't require authentication
-        // const { userId } = await auth();
-        // if (!userId) {
-        //     return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
-        // }
-
-        // const user = await User.findById(userId);
-        // if (!user) {
-        //     return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
-        // }
-
         const { searchParams } = new URL(request.url);
         const page = parseInt(searchParams.get("page")) || 1;
-        const limit = parseInt(searchParams.get("limit")) || 2; // number of days per page
+        const limit = parseInt(searchParams.get("limit")) || 3;
+
+        // Calculate today & yesterday
+        const now = new Date();
+        const today = new Date(now);
+        today.setHours(0, 0, 0, 0);
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const todayStr = today.toISOString().split("T")[0];
+        const yesterdayStr = yesterday.toISOString().split("T")[0];
 
         const pipeline = [
             {
@@ -185,11 +185,12 @@ export const GET = async (request) => {
                 },
             },
             { $unwind: "$user" },
-            { $sort: { createdAt: -1 } }, // latest attendance first within the day
+            { $sort: { createdAt: -1 } },
             {
                 $group: {
                     _id: "$formattedDate",
                     day: { $first: "$dayName" },
+                    rawDate: { $first: "$createdAt" },
                     attendances: {
                         $push: {
                             id: "$_id",
@@ -201,21 +202,35 @@ export const GET = async (request) => {
                     },
                 },
             },
-            { $sort: { _id: -1 } }, // latest date groups first
-            {
-                $project: {
-                    _id: 0,
-                    date: "$_id",
-                    day: 1,
-                    attendances: 1,
-                },
-            },
+            { $sort: { _id: -1 } },
         ];
 
         const options = { page, limit };
-        const result = await Attendance.aggregatePaginate(Attendance.aggregate(pipeline), options);
+        let result = await Attendance.aggregatePaginate(Attendance.aggregate(pipeline), options);
 
-        return NextResponse.json({ success: true, ...result }, { status: 200 });
+        // Post-process date labels
+        result.docs = result.docs.map((doc) => {
+            const isoDate = doc._id;
+
+            if (isoDate === todayStr) {
+                doc.date = "Today";
+            } else if (isoDate === yesterdayStr) {
+                doc.date = "Yesterday";
+            } else {
+                const d = new Date(doc.rawDate);
+                doc.date = d.toLocaleDateString("en-US", {
+                    // year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                });
+            }
+
+            delete doc._id; // clean response
+            delete doc.rawDate;
+            return doc;
+        });
+
+        return NextResponse.json({ success: true, data: { ...result } }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }

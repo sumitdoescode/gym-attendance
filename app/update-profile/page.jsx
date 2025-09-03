@@ -9,11 +9,13 @@ import { User, Key, ArrowRight } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/Loading";
 
 const page = () => {
     const [fullName, setFullName] = useState("");
     const [gymCode, setGymCode] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [updating, setUpdating] = useState(false);
 
     const router = useRouter();
 
@@ -28,6 +30,8 @@ const page = () => {
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
+            } finally {
+                setLoading(false);
             }
         };
         getUser();
@@ -35,7 +39,7 @@ const page = () => {
 
     const updateProfile = async () => {
         try {
-            setLoading(true);
+            setUpdating(true);
             const { data } = await axios.post("/api/user", {
                 fullName,
                 gymCode,
@@ -47,7 +51,7 @@ const page = () => {
                 title: error?.response?.data?.message || "Try again later",
             });
         } finally {
-            setLoading(false);
+            setUpdating(false);
         }
     };
 
@@ -56,6 +60,8 @@ const page = () => {
         updateProfile();
     };
     const isFormValid = fullName.trim().length > 3 && gymCode.trim().length > 0;
+
+    if (loading) return <Loading />;
     return (
         <section className="py-20">
             <Container>
@@ -109,10 +115,10 @@ const page = () => {
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                disabled={!isFormValid || loading}
+                                disabled={!isFormValid || updating}
                                 className="w-full h-12 bg-primary hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-primary-foreground text-base font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:cursor-not-allowed mt-8"
                             >
-                                {loading ? (
+                                {updating ? (
                                     <div className="flex items-center justify-center space-x-2">
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                         <span>Saving...</span>

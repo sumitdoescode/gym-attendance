@@ -6,6 +6,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { dark } from "@clerk/themes";
 import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+// import { dark } from "@clerk/themes";
 
 const urbanist = Urbanist({
     variable: "--font-urbanist",
@@ -25,25 +28,29 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <ClerkProvider
-            appearance={{
-                baseTheme: dark,
-                elements: {
-                    avatarBox: {
-                        width: "40px",
-                        height: "40px",
-                    },
-                },
-            }}
-        >
-            <html lang="en">
-                <body className={`${urbanist.variable} antialiased`}>
+        <html lang="en">
+            <body className={`${urbanist.variable} antialiased`}>
+                <ClerkProvider
+                    appearance={{
+                        baseTheme: dark,
+                        elements: {
+                            avatarBox: {
+                                width: "40px",
+                                height: "40px",
+                            },
+                        },
+                    }}
+                >
                     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-                        {children}
-                        <Toaster />
+                        <SidebarProvider>
+                            <AppSidebar />
+                            <SidebarTrigger />
+                            {children}
+                            <Toaster />
+                        </SidebarProvider>
                     </ThemeProvider>
-                </body>
-            </html>
-        </ClerkProvider>
+                </ClerkProvider>
+            </body>
+        </html>
     );
 }

@@ -5,7 +5,7 @@ import { Target, Calendar, Flame } from "lucide-react";
 
 const ProfileStats = ({ totalAttendance, thisMonthAttendance, streak }) => {
     return (
-        <div className="mt-16 flex flex-col sm:flex-row gap-5">
+        <div className="mt-10 flex flex-col sm:flex-row gap-5">
             {/* first stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
                 <CardHeader className={"p-0"}>

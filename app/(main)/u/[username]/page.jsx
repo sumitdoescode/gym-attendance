@@ -76,10 +76,10 @@ const page = () => {
                         <div>
                             <h1 className="text-foreground font-bold text-3xl md:text-4xl tracking-tight">{user?.fullName}</h1>
                             <h2 className="text-muted-foreground text-base -mt-1">@{user?.username}</h2>
-                            <div className="flex items-center gap-0.5 mt-1">
+                            {/* <div className="flex items-center gap-0.5 mt-1">
                                 <MapPin className="w-4 h-4 text-[#38BDF8]" />
                                 <span className="text-muted-foreground text-base">Fitness Zone Gym 3</span>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 

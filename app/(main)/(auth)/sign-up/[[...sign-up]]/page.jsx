@@ -4,10 +4,10 @@ import { SignUp } from "@clerk/nextjs";
 
 const page = () => {
     return (
-        <section className="py-10">
+        <section className="min-h-screen flex items-center justify-center">
             <Container>
                 <div className="flex items-center justify-center">
-                    <SignUp fallbackredirecturl="/" />
+                    <SignUp fallbackRedirectUrl="/complete-profile" />
                 </div>
             </Container>
         </section>
