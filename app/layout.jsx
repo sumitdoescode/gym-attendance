@@ -1,12 +1,20 @@
-import { Inter } from "next/font/google";
-import { Geist } from "next/font/google";
+import { Urbanist } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { Bebas_Neue } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { dark } from "@clerk/themes";
+import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-    variable: "--font-inter",
+const urbanist = Urbanist({
+    variable: "--font-urbanist",
+    subsets: ["latin"],
+});
+
+export const logoFont = Bebas_Neue({
+    variable: "--font-bebas-neue",
+    weight: "400",
     subsets: ["latin"],
 });
 
@@ -17,22 +25,22 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <ClerkProvider>
+        <ClerkProvider
+            appearance={{
+                baseTheme: dark,
+                elements: {
+                    avatarBox: {
+                        width: "40px",
+                        height: "40px",
+                    },
+                },
+            }}
+        >
             <html lang="en">
-                {/* <SignedOut>
-                    <SignInButton />
-                    <SignUpButton>
-                        <button className="bg-[#6c47ff] text-ceramic-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">Sign Up</button>
-                    </SignUpButton>
-                </SignedOut>
-                <SignedIn>
-                    <UserButton />
-                </SignedIn> */}
-
-                <body className={`${geistSans.variable} antialiased`}>
+                <body className={`${urbanist.variable} antialiased`}>
                     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-                        <Navbar />
                         {children}
+                        <Toaster />
                     </ThemeProvider>
                 </body>
             </html>

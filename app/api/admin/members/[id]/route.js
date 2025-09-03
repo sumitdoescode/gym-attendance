@@ -21,18 +21,26 @@ export const PATCH = async (request, { params }) => {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
 
-        const { name, gymCode, phone } = await request.json();
-        if (!name?.trim() || !gymCode?.trim()) {
-            // name and gymCode are required
-            return NextResponse.json({ success: false, message: "Name and Gym Code are required" }, { status: 400 });
+        const { fullName, gymCode, phone } = await request.json();
+        if (!fullName?.trim() || !gymCode?.trim()) {
+            console.log(fullName, gymCode, phone);
+            // fullName and gymCode are required
+            return NextResponse.json({ success: false, message: "Full Name and Gym Code are required" }, { status: 400 });
         }
 
-        const { id } = params;
+        // id validation
+        const { id } = await params;
         if (!isValidObjectId(id)) {
             return NextResponse.json({ success: false, message: "Invalid ID format" }, { status: 400 });
         }
 
-        const member = await Member.findByIdAndUpdate(id, { name: name.trim(), gymCode: gymCode.trim(), phone: phone?.trim() ? phone.trim() : undefined }, { new: true });
+        // check if gymCode already exists
+        const existingMember = await Member.findOne({ gymCode: gymCode.trim() });
+        if (existingMember && existingMember._id.toString() !== id) {
+            return NextResponse.json({ success: false, message: "Gym Code already exists" }, { status: 400 });
+        }
+
+        const member = await Member.findByIdAndUpdate(id, { fullName: fullName.trim(), gymCode: gymCode.trim(), phone: phone?.trim() || "" }, { new: true });
         if (!member) {
             return NextResponse.json({ success: false, message: "Member not found" }, { status: 404 });
         }
@@ -58,7 +66,7 @@ export const DELETE = async (request, { params }) => {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
 
-        const { id } = params;
+        const { id } = await params;
         if (!isValidObjectId(id)) {
             return NextResponse.json({ success: false, message: "Invalid ID format" }, { status: 400 });
         }

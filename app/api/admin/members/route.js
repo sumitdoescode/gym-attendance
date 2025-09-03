@@ -1,10 +1,12 @@
 import Member from "@/models/Member";
+
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import User from "@/models/User";
 
 // GET all members
+// GET => /api/admin/members
 export const GET = async (request) => {
     try {
         await connectDB();
@@ -20,13 +22,14 @@ export const GET = async (request) => {
         }
 
         const members = await Member.find();
-        return NextResponse.json({ success: true, message: "Members retrieved successfully", data: members }, { status: 200 });
+        return NextResponse.json({ success: true, message: "Members retrieved successfully", data: { members } }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
 };
 
 // Create Member
+// POST => /api/admin/members
 export const POST = async (request) => {
     try {
         await connectDB();
@@ -42,17 +45,18 @@ export const POST = async (request) => {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
 
-        const { name, gymCode, phone } = await request.json();
-        console.log(name, gymCode, phone);
-        if (!name?.trim() || !gymCode?.trim()) {
-            return NextResponse.json({ success: false, message: "Name and Gym Code are required" }, { status: 400 });
+        const { fullName, gymCode, phone } = await request.json();
+        console.log(fullName, gymCode, phone);
+        if (!fullName?.trim() || !gymCode?.trim()) {
+            return NextResponse.json({ success: false, message: "Full Name and Gym Code are required" }, { status: 400 });
         }
+
         // Check if a member with the same gymCode already exists
         const existingMember = await Member.findOne({ gymCode: gymCode?.trim() });
         if (existingMember) {
             return NextResponse.json({ success: false, message: "Member with the same Gym Code already exists" }, { status: 400 });
         }
-        await Member.create({ name: name.trim(), gymCode: gymCode.trim(), phone: phone ? phone.trim() : undefined });
+        await Member.create({ fullName: fullName.trim(), gymCode: gymCode.trim(), phone: phone ? phone.trim() : undefined });
         return NextResponse.json({ success: true, message: "Member created successfully" }, { status: 201 });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });

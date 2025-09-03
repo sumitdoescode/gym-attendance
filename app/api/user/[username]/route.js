@@ -67,8 +67,10 @@ export const GET = async (request, { params }) => {
             {
                 success: true,
                 data: {
-                    ...user,
-                    attendanceHistory: history,
+                    user: {
+                        ...user,
+                        attendanceHistory: history,
+                    },
                 },
             },
             { status: 200 }

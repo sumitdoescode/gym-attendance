@@ -1,16 +1,25 @@
 import React from "react";
 import Container from "./Container";
 import Link from "next/link";
+import { logoFont } from "@/app/layout";
+import { Button } from "@/components/ui/button";
+import { SignUp, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 const Navbar = () => {
     return (
-        <div className="bg-background text-primary py-2">
+        <nav className="text-primary py-2 fixed z-10 min-w-full border-b-1 bg-background/20 backdrop-blur-md">
             <Container>
-                <Link href={"/"} className="text-3xl font-semibold">
-                    Strongly
-                </Link>
+                <div className="flex items-center justify-between">
+                    <Link href={"/"} className={`${logoFont.className} text-3xl font-bold tracking-tight uppercase`}>
+                        Strong
+                        <span className="text-white">ly</span>
+                    </Link>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
+                </div>
             </Container>
-        </div>
+        </nav>
     );
 };
 

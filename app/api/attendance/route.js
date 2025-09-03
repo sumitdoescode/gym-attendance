@@ -36,17 +36,17 @@ export const POST = async (request) => {
         }
 
         // ✅ Gym timing restriction (5–10 AM, 5–10 PM)
-        const inMorning = currentHour >= 5 && currentHour < 10;
-        const inEvening = currentHour >= 17 && currentHour < 22;
-        if (!inMorning && !inEvening) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: "Attendance only allowed during gym hours (5–10 AM, 5–10 PM)",
-                },
-                { status: 400 }
-            );
-        }
+        // const inMorning = currentHour >= 5 && currentHour < 10;
+        // const inEvening = currentHour >= 17 && currentHour < 22;
+        // if (!inMorning && !inEvening) {
+        //     return NextResponse.json(
+        //         {
+        //             success: false,
+        //             message: "Attendance only allowed during gym hours (5–10 AM, 5–10 PM)",
+        //         },
+        //         { status: 400 }
+        //     );
+        // }
 
         // ✅ Prevent multiple attendances in same day
         const startOfToday = new Date();
@@ -61,13 +61,10 @@ export const POST = async (request) => {
             return NextResponse.json({ success: false, message: "Attendance already marked for today" }, { status: 400 });
         }
 
-        // ✅ Mark attendance
-        const attendance = await Attendance.create({ userId: user._id, createdAt: new Date() });
-
         // ✅ Streak logic (skip Sundays)
-        let streak = 1; // at least today counts
+        let streak = 1; // today counts at least
         if (dayOfWeek === 1) {
-            // Today is Monday → check Saturday (skip Sunday)
+            // Monday → check Saturday (skip Sunday)
             const startOfSaturday = new Date(startOfToday);
             startOfSaturday.setDate(startOfSaturday.getDate() - 2);
             const endOfSaturday = new Date(startOfSaturday);
@@ -79,7 +76,7 @@ export const POST = async (request) => {
             });
 
             if (saturdayAttendance) {
-                streak = (user.streak || 0) + 1;
+                streak = (user.stats.streak || 0) + 1;
             }
         } else {
             // Normal case → check yesterday
@@ -94,38 +91,40 @@ export const POST = async (request) => {
             });
 
             if (yesterdayAttendance) {
-                streak = (user.streak || 0) + 1;
+                streak = (user.stats.streak || 0) + 1;
             }
         }
 
-        // ✅ Update user stats
+        // ✅ Update user stats (before creating today’s record)
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
 
         const lastAttendance = await Attendance.findOne({ userId: user._id }).sort({ createdAt: -1 });
 
         if (!lastAttendance || lastAttendance.createdAt.getMonth() !== currentMonth || lastAttendance.createdAt.getFullYear() !== currentYear) {
-            // First attendance of new month → reset
-            user.thisMonthAttendance = 1;
+            // First attendance of new month → reset month count
+            user.stats.thisMonthAttendance = 1;
         } else {
             // Same month → increment
-            user.thisMonthAttendance = (user.thisMonthAttendance || 0) + 1;
+            user.stats.thisMonthAttendance = (user.stats.thisMonthAttendance || 0) + 1;
         }
 
-        user.totalAttendance = (user.totalAttendance || 0) + 1;
-        user.streak = streak;
+        user.stats.totalAttendance = (user.stats.totalAttendance || 0) + 1;
+        user.stats.streak = streak;
 
         await user.save();
+
+        // ✅ Finally mark attendance
+        await Attendance.create({ userId: user._id });
 
         return NextResponse.json(
             {
                 success: true,
                 message: "Attendance marked successfully",
-                // data: attendance,
                 // stats: {
-                //     total: user.totalAttendance,
-                //     thisMonth: user.thisMonthAttendance,
-                //     currentStreak: user.streak,
+                //   total: user.totalAttendance,
+                //   thisMonth: user.thisMonthAttendance,
+                //   streak: user.streak,
                 // },
             },
             { status: 201 }
@@ -195,7 +194,7 @@ export const GET = async (request) => {
                         $push: {
                             id: "$_id",
                             time: "$time",
-                            name: "$user.name",
+                            fullName: "$user.fullName",
                             username: "$user.username",
                             avatar: "$user.avatar",
                         },

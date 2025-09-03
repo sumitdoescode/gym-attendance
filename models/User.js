@@ -5,8 +5,8 @@ const userSchema = new mongoose.Schema(
         clerkId: { type: String, required: true, unique: true },
         email: { type: String, required: true, unique: true },
         username: { type: String, required: true, unique: true },
-        name: { type: String, required: true },
-        gymCode: { type: String, required: true, unique: true },
+        fullName: { type: String },
+        gymCode: { type: String, unique: true },
         avatar: { type: String },
         role: {
             type: String,

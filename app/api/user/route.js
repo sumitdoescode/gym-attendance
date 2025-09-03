@@ -67,9 +67,11 @@ export const GET = async (request) => {
             {
                 success: true,
                 data: {
-                    ...user,
-                    attendanceHistory: history, // ✅ we only keep history
-                    // user.stats already has totalAttendance, thisMonthAttendance, streak
+                    user: {
+                        ...user,
+                        attendanceHistory: history, // ✅ we only keep history
+                        // user.stats already has totalAttendance, thisMonthAttendance, streak
+                    },
                 },
             },
             { status: 200 }
@@ -94,20 +96,20 @@ export const POST = async (request) => {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
         }
 
-        const { name, gymCode } = await request.json();
-        if (!name?.trim() || !gymCode?.trim()) {
-            return NextResponse.json({ success: false, message: "Name and Gym Code are required" }, { status: 400 });
+        const { fullName, gymCode } = await request.json();
+        if (!fullName?.trim() || !gymCode?.trim()) {
+            return NextResponse.json({ success: false, message: "Full Name and Gym Code are required" }, { status: 400 });
         }
 
-        // check if member exists in correct name, gymCode pair
-        const validMember = await Member.findOne({ name: name?.trim(), gymCode: gymCode?.trim() });
+        // check if member exists in correct fullName, gymCode pair
+        const validMember = await Member.findOne({ fullName: fullName?.trim(), gymCode: gymCode?.trim() });
         if (!validMember) {
-            return NextResponse.json({ success: false, message: "Invalid name or gym code" }, { status: 400 });
+            return NextResponse.json({ success: false, message: "Invalid full name or gym code" }, { status: 400 });
         }
 
         // update the user profile
         user.gymCode = gymCode.trim();
-        user.name = name.trim();
+        user.fullName = fullName.trim();
         user.isProfileComplete = true;
         await user.save();
 
