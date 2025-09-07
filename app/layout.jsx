@@ -1,19 +1,12 @@
+"use client";
+
 import { Urbanist } from "next/font/google";
 import "./globals.css";
 import { Bebas_Neue } from "next/font/google";
-import Navbar from "@/components/Navbar";
-import { ThemeProvider } from "@/components/theme-provider";
-import { dark } from "@clerk/themes";
-import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { Toaster } from "@/components/ui/sonner";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
-// import { dark } from "@clerk/themes";
 
-const urbanist = Urbanist({
-    variable: "--font-urbanist",
-    subsets: ["latin"],
-});
+import Provider from "@/components/Provider";
+
+const urbanist = Urbanist({ subsets: ["latin"], variable: "--font-urbanist" });
 
 export const logoFont = Bebas_Neue({
     variable: "--font-bebas-neue",
@@ -21,7 +14,7 @@ export const logoFont = Bebas_Neue({
     subsets: ["latin"],
 });
 
-export const metadata = {
+const metadata = {
     title: "Strongly Check-in",
     description: "Easily track gym check-ins, monitor attendance trends, and manage members with Strongly Check-in — the smart gym attendance system.",
 };
@@ -30,26 +23,7 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className={`${urbanist.variable} antialiased`}>
-                <ClerkProvider
-                    appearance={{
-                        baseTheme: dark,
-                        elements: {
-                            avatarBox: {
-                                width: "40px",
-                                height: "40px",
-                            },
-                        },
-                    }}
-                >
-                    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-                        {/* <SidebarProvider> */}
-                        {/* <AppSidebar /> */}
-                        {/* <SidebarTrigger /> */}
-                        {children}
-                        <Toaster />
-                        {/* </SidebarProvider> */}
-                    </ThemeProvider>
-                </ClerkProvider>
+                <Provider>{children}</Provider>
             </body>
         </html>
     );

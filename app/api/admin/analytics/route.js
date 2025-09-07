@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import User from "@/models/User";
+import Member from "@/models/Member";
 import { auth } from "@clerk/nextjs/server";
 
 // GET /api/admin/analytics
@@ -113,7 +114,7 @@ export const GET = async () => {
         ]);
 
         // ✅ Total Gym Members
-        const totalMembers = await User.countDocuments();
+        const totalMembers = await Member.countDocuments();
 
         return NextResponse.json(
             {

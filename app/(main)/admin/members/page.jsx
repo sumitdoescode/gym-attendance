@@ -43,8 +43,8 @@ const Page = () => {
                 {/* total members count card */}
                 <Card className="mt-5 gap-0 p-4 border-none">
                     <CardHeader className="m-0 p-0">
-                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                            <Users className="w-6 h-6 text-primary" />
+                        <div className="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center">
+                            <Users className="w-6 h-6 text-rose-500" />
                         </div>
                     </CardHeader>
                     <CardContent className="text-right p-0 mt-0">
