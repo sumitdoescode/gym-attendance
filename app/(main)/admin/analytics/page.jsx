@@ -37,7 +37,7 @@ const Page = () => {
                 <h1 className="text-4xl font-bold">Analytics</h1>
 
                 <AnalyticsStats {...analytics} />
-                <h1 className="text-2xl mt-10 font-bold">Last 10 days</h1>
+                {/* <h1 className="text-2xl mt-10 font-bold">Last 10 days</h1> */}
                 <AnalyticsChart {...analytics} />
             </Container>
         </section>
