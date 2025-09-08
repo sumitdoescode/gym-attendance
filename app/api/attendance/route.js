@@ -5,6 +5,7 @@ import Attendance from "@/models/Attendance";
 import Member from "@/models/Member";
 import { auth } from "@clerk/nextjs/server";
 import connectDB from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 
 // api/attendance => POST
 // create an attendance or mark an attendance
@@ -36,17 +37,17 @@ export const POST = async (request) => {
         }
 
         // ✅ Gym timing restriction (5–10 AM, 5–10 PM)
-        // const inMorning = currentHour >= 5 && currentHour < 10;
-        // const inEvening = currentHour >= 17 && currentHour < 22;
-        // if (!inMorning && !inEvening) {
-        //     return NextResponse.json(
-        //         {
-        //             success: false,
-        //             message: "Attendance only allowed during gym hours (5–10 AM, 5–10 PM)",
-        //         },
-        //         { status: 400 }
-        //     );
-        // }
+        const inMorning = currentHour >= 5 && currentHour < 10;
+        const inEvening = currentHour >= 17 && currentHour < 22;
+        if (!inMorning && !inEvening) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Attendance only allowed during gym hours (5–10 AM, 5–10 PM)",
+                },
+                { status: 400 }
+            );
+        }
 
         // ✅ Prevent multiple attendances in same day
         const startOfToday = new Date();
@@ -115,7 +116,54 @@ export const POST = async (request) => {
         await user.save();
 
         // ✅ Finally mark attendance
-        await Attendance.create({ userId: user._id });
+        const attendance = await Attendance.create({ userId: user._id });
+
+        // format fields same as feed API
+        const createdAt = attendance.createdAt;
+
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const day = dayNames[createdAt.getDay()];
+
+        const time = createdAt.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        });
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        let dateLabel;
+        if (createdAt >= today) {
+            dateLabel = "Today";
+        } else if (createdAt >= yesterday) {
+            dateLabel = "Yesterday";
+        } else {
+            dateLabel = createdAt.toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+            });
+        }
+
+        // payload to pusher
+        const payload = {
+            day: day,
+            date: dateLabel,
+            attendances: [
+                {
+                    id: attendance._id,
+                    time,
+                    fullName: user.fullName,
+                    username: user.username,
+                    avatar: user.avatar,
+                },
+            ],
+        };
+
+        await pusherServer.trigger("feed", "new_attendance", payload);
 
         return NextResponse.json(
             {

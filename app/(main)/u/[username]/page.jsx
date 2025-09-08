@@ -4,10 +4,8 @@ import Container from "@/components/Container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Users, Shield, Clock, EllipsisVertical, Loader2, Home } from "lucide-react";
 
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import MarkAttendance from "@/components/MarkAttendance";
 import ProfileStats from "@/components/ProfileStats";
 import AttendanceHistory from "@/components/AttendanceHistory";
 import { useParams } from "next/navigation";
@@ -82,15 +80,6 @@ const page = () => {
                             </div> */}
                         </div>
                     </div>
-
-                    <Popover>
-                        <PopoverTrigger>
-                            <div className={`w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                                <EllipsisVertical className={`w-6 h-6 text-blue-500`} />
-                            </div>
-                        </PopoverTrigger>
-                        <PopoverContent>Place content for the popover here.</PopoverContent>
-                    </Popover>
                 </div>
 
                 <ProfileStats {...user?.stats} />

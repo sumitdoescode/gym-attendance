@@ -25,44 +25,56 @@ export const GET = async () => {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
 
-        const now = new Date();
+        // Base start and end of today
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
 
-        // ✅ Start + End of today
-        const startOfToday = new Date(now.setHours(0, 0, 0, 0));
-        const endOfToday = new Date(now.setHours(23, 59, 59, 999));
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
 
-        // ✅ Today Morning 5–10 AM
+        // Today Morning
         const todayMorning = await Attendance.countDocuments({
             createdAt: {
-                $gte: new Date(startOfToday.setHours(5, 0, 0, 0)),
-                $lt: new Date(startOfToday.setHours(10, 0, 0, 0)),
+                $gte: new Date(new Date(startOfToday).setHours(5, 0, 0, 0)),
+                $lt: new Date(new Date(startOfToday).setHours(10, 0, 0, 0)),
             },
         });
 
-        // ✅ Today Evening 5–10 PM
+        // Today Evening
         const todayEvening = await Attendance.countDocuments({
             createdAt: {
-                $gte: new Date(startOfToday.setHours(17, 0, 0, 0)),
-                $lt: new Date(startOfToday.setHours(22, 0, 0, 0)),
+                $gte: new Date(new Date(startOfToday).setHours(17, 0, 0, 0)),
+                $lt: new Date(new Date(startOfToday).setHours(22, 0, 0, 0)),
             },
         });
 
-        // ✅ Today Total Attendance
+        // Today Total
         const todayTotal = await Attendance.countDocuments({
             createdAt: { $gte: startOfToday, $lte: endOfToday },
         });
 
-        // ✅ Last 10 days breakdown
+        // ✅ Last 10 days breakdown (including today)
         const tenDaysAgo = new Date();
-        tenDaysAgo.setDate(tenDaysAgo.getDate() - 9); // include today
+        tenDaysAgo.setDate(tenDaysAgo.getDate() - 9);
+        tenDaysAgo.setHours(0, 0, 0, 0); // start of the day
 
         const last10days = await Attendance.aggregate([
-            { $match: { createdAt: { $gte: tenDaysAgo } } },
+            {
+                $match: {
+                    createdAt: { $gte: tenDaysAgo },
+                },
+            },
             {
                 $addFields: {
-                    date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-                    dayOfWeek: { $dayOfWeek: "$createdAt" },
-                    hour: { $hour: "$createdAt" },
+                    date: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$createdAt",
+                            timezone: "Asia/Kolkata", // 👈 your timezone
+                        },
+                    },
+                    dayOfWeek: { $dayOfWeek: { date: "$createdAt", timezone: "Asia/Kolkata" } },
+                    hour: { $hour: { date: "$createdAt", timezone: "Asia/Kolkata" } },
                 },
             },
             {
@@ -110,7 +122,7 @@ export const GET = async () => {
                     total: 1,
                 },
             },
-            { $sort: { date: 1 } },
+            { $sort: { date: -1 } },
         ]);
 
         // ✅ Total Gym Members
@@ -123,8 +135,8 @@ export const GET = async () => {
                     todayMorning,
                     todayEvening,
                     todayTotal,
-                    last10days,
                     totalMembers,
+                    last10days,
                 },
             },
             { status: 200 }

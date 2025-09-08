@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import Loading from "@/components/Loading";
 import axios from "axios";
 import FeedResults from "@/components/FeedResults";
+import { pusherClient } from "@/lib/pusher-client";
 
 const page = () => {
-    const [results, setResults] = useState([]);
+    const [feed, setFeed] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasNextPage, setHasNextPage] = useState(true);
     const [nextPage, setNextPage] = useState(2);
@@ -18,9 +19,9 @@ const page = () => {
             const { data } = await axios.get(`/api/attendance?page=${pageNum}&limit=2`);
             if (data.success) {
                 if (pageNum === 1) {
-                    setResults(data.data.docs);
+                    setFeed(data.data.docs);
                 } else {
-                    setResults((prev) => [...prev, ...data.data.docs]);
+                    setFeed((prev) => [...prev, ...data.data.docs]);
                 }
                 setHasNextPage(data.data.hasNextPage);
                 setNextPage(data.data.nextPage);
@@ -33,7 +34,25 @@ const page = () => {
     };
 
     useEffect(() => {
+        const channel = pusherClient.subscribe("feed");
+
+        channel.bind("new-attendance", (doc) => {
+            setFeed((prev) => {
+                // If this date already exists → prepend to its attendances
+                const existing = prev.find((d) => d.date === doc.date);
+                if (existing) {
+                    existing.attendances = [doc.attendances[0], ...existing.attendances];
+                    return [...prev];
+                }
+                // If new date → prepend whole doc
+                return [doc, ...prev];
+            });
+        });
+
         fetchFeed(1);
+        return () => {
+            pusherClient.unsubscribe("attendance");
+        };
     }, []);
 
     if (loading) {
@@ -64,7 +83,7 @@ const page = () => {
                 </div>
 
                 {/* feed results */}
-                <FeedResults results={results} />
+                <FeedResults feed={feed} />
 
                 {/* load more button */}
                 {hasNextPage && (

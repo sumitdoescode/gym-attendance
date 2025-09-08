@@ -4,14 +4,14 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import { Badge } from "@/components/ui/badge";
 
 const AttendanceHistory = ({ attendanceHistory }) => {
-    if (attendanceHistory.length === 0) {
+    if (attendanceHistory?.length === 0) {
         return null;
     }
     return (
         <div>
             <h2 className="text-2xl font-bold mt-10">Attendance History</h2>
             <div className="flex flex-col gap-3 mt-5">
-                {attendanceHistory.length &&
+                {attendanceHistory?.length &&
                     attendanceHistory.map(({ _id, date, day, time }) => {
                         return (
                             <Card className={"cursor-pointer border-none transition-all duration-200 p-3 gap-0"} key={_id}>

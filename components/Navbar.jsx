@@ -13,10 +13,16 @@ const Navbar = () => {
         <nav className="text-primary py-2 fixed z-10 min-w-full border-b-1 bg-background/20 backdrop-blur-md w-full">
             <Container>
                 <div className="flex items-center justify-between">
-                    <Sidebar />
                     <SignedIn>
+                        <Sidebar />
                         <UserButton />
                     </SignedIn>
+                    <SignedOut>
+                        <Link href={"/"} className={`${logoFont.className} text-3xl font-bold tracking-tight uppercase text-primary`}>
+                            Strong
+                            <span className="text-white">ly</span>
+                        </Link>
+                    </SignedOut>
                 </div>
             </Container>
         </nav>

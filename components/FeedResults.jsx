@@ -6,8 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
 
-const FeedResults = ({ results }) => {
-    return results.map((doc, index) => {
+const FeedResults = ({ feed }) => {
+    console.log(feed);
+
+    // first mapping them by days
+    return feed.map((doc, index) => {
         return (
             <div className="mt-10" key={index}>
                 <div className="flex items-center justify-between">
@@ -19,6 +22,7 @@ const FeedResults = ({ results }) => {
                     {/* <h2 className="text-sm text-orange-500 bg-orange-500/10 p-2 rounded-full">{doc.day}</h2> */}
                 </div>
                 <div className="flex flex-col gap-3 mt-3">
+                    {/* then mapping them by attendances */}
                     {doc.attendances.map(({ id, time, fullName, username, avatar }) => {
                         return (
                             <Card className={"cursor-pointer border-none transition-all duration-200 p-3 gap-0"} key={id}>

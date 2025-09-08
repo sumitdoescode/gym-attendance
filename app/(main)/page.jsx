@@ -141,7 +141,7 @@ const page = () => {
                         {/* <p className="text-base text-muted-foreground mt-3 leading-relaxed">Transform your gym experience with modern attendance</p> */}
                     </div>
 
-                    <div className="flex flex-col md:flex-row gap-10 mt-16">
+                    <div className="flex flex-col md:flex-row gap-10 mt-16 justify-between">
                         <div className="flex md:flex-col items-start gap-4">
                             <div>
                                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-1.5">
