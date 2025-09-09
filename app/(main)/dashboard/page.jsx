@@ -62,7 +62,7 @@ const page = () => {
                     </div>
                 </div>
 
-                <MarkAttendance />
+                <MarkAttendance fetchOwnUserProfile={fetchOwnUserProfile} />
                 <ProfileStats {...user?.stats} />
                 <AttendanceHistory attendanceHistory={user?.attendanceHistory} />
             </Container>

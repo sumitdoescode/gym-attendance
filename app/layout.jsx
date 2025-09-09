@@ -3,8 +3,8 @@
 import { Urbanist } from "next/font/google";
 import "./globals.css";
 import { Bebas_Neue } from "next/font/google";
-
 import Provider from "@/components/Provider";
+import UserContextProvider from "@/contexts/UserContextProvider";
 
 const urbanist = Urbanist({ subsets: ["latin"], variable: "--font-urbanist" });
 
@@ -23,7 +23,9 @@ export default function RootLayout({ children }) {
     return (
         <html lang="en">
             <body className={`${urbanist.variable} antialiased`}>
-                <Provider>{children}</Provider>
+                <Provider>
+                    <UserContextProvider>{children}</UserContextProvider>
+                </Provider>
             </body>
         </html>
     );

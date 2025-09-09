@@ -10,32 +10,21 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import { useUserContext } from "@/contexts/UserContextProvider";
 
 const page = () => {
     const [fullName, setFullName] = useState("");
     const [gymCode, setGymCode] = useState("");
-    const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
 
     const router = useRouter();
-
+    const { user, loading } = useUserContext();
     useEffect(() => {
-        const getUser = async () => {
-            try {
-                const { data } = await axios.get("/api/user/me");
-                if (data.success) {
-                    console.log(data);
-                    setFullName(data.data.user.fullName);
-                    setGymCode(data.data.user.gymCode);
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        getUser();
-    }, []);
+        if (user) {
+            setFullName(user?.fullName);
+            setGymCode(user?.gymCode);
+        }
+    }, [user]);
 
     const updateProfile = async () => {
         try {
@@ -59,9 +48,9 @@ const page = () => {
         e.preventDefault();
         updateProfile();
     };
-    const isFormValid = fullName.trim().length > 3 && gymCode.trim().length > 0;
 
     if (loading) return <Loading />;
+    const isFormValid = fullName?.trim().length > 3 && gymCode?.trim().length > 0;
     return (
         <section className="py-20">
             <Container>

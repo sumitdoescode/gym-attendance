@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CheckCircle, BarChart3, Zap, UserCheck, Users, TrendingUp, Shield, Clock } from "lucide-react";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { SignUp, SignedIn, SignedOut } from "@clerk/nextjs";
 
 const page = () => {
     return (
@@ -22,7 +23,8 @@ const page = () => {
                         <p className="text-lg text-muted-foreground mt-3 text-center font-normal">See every member check-in as it happens — track attendance, trends, streaks in real time.</p>
                         <Link href="/sign-in" className="mt-5 mx-auto flex w-fit text-base">
                             <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer"}>
-                                Get Started
+                                <SignedOut>Get Started</SignedOut>
+                                <SignedIn>Go to Feed</SignedIn>
                             </Button>
                         </Link>
                     </div>

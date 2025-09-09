@@ -7,6 +7,7 @@ import Loading from "@/components/Loading";
 import axios from "axios";
 import FeedResults from "@/components/FeedResults";
 import { pusherClient } from "@/lib/pusher-client";
+import MarkAttendance from "@/components/MarkAttendance";
 
 const page = () => {
     const [feed, setFeed] = useState([]);
@@ -20,6 +21,7 @@ const page = () => {
             if (data.success) {
                 if (pageNum === 1) {
                     setFeed(data.data.docs);
+                    console.log(data.data.docs);
                 } else {
                     setFeed((prev) => [...prev, ...data.data.docs]);
                 }
@@ -34,24 +36,34 @@ const page = () => {
     };
 
     useEffect(() => {
+        // Subscribe to pusher channel
         const channel = pusherClient.subscribe("feed");
 
-        channel.bind("new-attendance", (doc) => {
+        channel.bind("new_attendance", (doc) => {
             setFeed((prev) => {
-                // If this date already exists → prepend to its attendances
-                const existing = prev.find((d) => d.date === doc.date);
-                if (existing) {
-                    existing.attendances = [doc.attendances[0], ...existing.attendances];
+                // Check if date already exists in feed
+                const existingDate = prev.find((d) => d.date === doc.date);
+
+                if (existingDate) {
+                    // Avoid adding duplicate attendance
+                    const alreadyExists = existingDate.attendances.some((a) => a.id === doc.attendances[0].id);
+
+                    if (!alreadyExists) {
+                        existingDate.attendances = [doc.attendances[0], ...existingDate.attendances];
+                    }
                     return [...prev];
                 }
-                // If new date → prepend whole doc
+
+                // If this is a new date → prepend whole doc
                 return [doc, ...prev];
             });
         });
 
+        // Initial fetch
         fetchFeed(1);
+
         return () => {
-            pusherClient.unsubscribe("attendance");
+            pusherClient.unsubscribe("feed");
         };
     }, []);
 
@@ -59,9 +71,10 @@ const page = () => {
         return <Loading />;
     }
     return (
-        <section className="py-20">
+        <section className="py-14">
             <Container>
-                <div className="flex items-center justify-between">
+                <MarkAttendance />
+                <div className="flex items-center justify-between mt-10">
                     <div>
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-primary/50 blur-3xl"></div>
@@ -77,9 +90,10 @@ const page = () => {
                             <span className="text-primary text-sm tracking-wider">LIVE</span>
                         </div>
                     </div>
+
                     {/* <Link href="/dashboard" className="inline-block">
                         <Button className={"rounded-full text-primary-foreground font-semibold cursor-pointer"}>Mark Attendance</Button>
-                    </Link> */}
+                        </Link> */}
                 </div>
 
                 {/* feed results */}

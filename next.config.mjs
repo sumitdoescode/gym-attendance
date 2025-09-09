@@ -16,9 +16,7 @@ const nextConfig = {
             },
         ],
     },
-    experimental: {
-        allowedDevOrigins: ["http://192.168.1.2:3000"],
-    },
+    experimental: {},
 };
 
 export default nextConfig;

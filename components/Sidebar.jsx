@@ -6,35 +6,17 @@ import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger
 import { AlignJustify } from "lucide-react";
 import { logoFont } from "@/app/layout";
 import Loading from "./Loading";
-import axios from "axios";
+import { useUserContext } from "@/contexts/UserContextProvider";
 
 const Sidebar = () => {
-    const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(null);
+    const { user, loading } = useUserContext();
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const { data } = await axios.get("/api/user/me");
-                if (data.success) {
-                    // if user is not admin
-                    if (data.data.user.role === "admin") {
-                        console.log("user is admin");
-                        setIsAdmin(true);
-                    } else {
-                        console.log("user is not admin");
-                        setIsAdmin(false);
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, []);
+        if (!loading && user && user.role === "admin") {
+            setIsAdmin(true);
+        }
+    }, [user, loading]);
 
     // Sidebar menu items
     const items = [
@@ -56,7 +38,7 @@ const Sidebar = () => {
         <Sheet className="">
             <SheetTrigger asChild className="sticky top-0 z-50 bg-background rounded-xl ">
                 <button className="p-2">
-                    <AlignJustify size={30} />
+                    <AlignJustify size={28} />
                 </button>
             </SheetTrigger>
 

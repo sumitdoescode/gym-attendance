@@ -37,17 +37,17 @@ export const POST = async (request) => {
         }
 
         // ✅ Gym timing restriction (5–10 AM, 5–10 PM)
-        const inMorning = currentHour >= 5 && currentHour < 10;
-        const inEvening = currentHour >= 17 && currentHour < 22;
-        if (!inMorning && !inEvening) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: "Attendance only allowed during gym hours (5–10 AM, 5–10 PM)",
-                },
-                { status: 400 }
-            );
-        }
+        // const inMorning = currentHour >= 5 && currentHour < 10;
+        // const inEvening = currentHour >= 17 && currentHour < 22;
+        // if (!inMorning && !inEvening) {
+        //     return NextResponse.json(
+        //         {
+        //             success: false,
+        //             message: "Attendance only allowed during gym hours (5–10 AM, 5–10 PM)",
+        //         },
+        //         { status: 400 }
+        //     );
+        // }
 
         // ✅ Prevent multiple attendances in same day
         const startOfToday = new Date();
@@ -178,6 +178,7 @@ export const POST = async (request) => {
             { status: 201 }
         );
     } catch (error) {
+        console.error("Attendance POST error:", error);
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
 };
@@ -192,21 +193,30 @@ export const GET = async (request) => {
         const page = parseInt(searchParams.get("page")) || 1;
         const limit = parseInt(searchParams.get("limit")) || 3;
 
-        // Calculate today & yesterday
+        // Force dates in Asia/Kolkata
+        const tz = "Asia/Kolkata";
         const now = new Date();
-        const today = new Date(now);
+
+        const today = new Date(now.toLocaleString("en-US", { timeZone: tz }));
         today.setHours(0, 0, 0, 0);
 
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
 
-        const todayStr = today.toISOString().split("T")[0];
-        const yesterdayStr = yesterday.toISOString().split("T")[0];
+        // ✅ format today & yesterday in IST, not UTC
+        const todayStr = today.toLocaleDateString("en-CA", { timeZone: tz }); // "2025-09-09"
+        const yesterdayStr = yesterday.toLocaleDateString("en-CA", { timeZone: tz }); // "2025-09-08"
 
         const pipeline = [
             {
                 $addFields: {
-                    formattedDate: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    formattedDate: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$createdAt",
+                            timezone: tz,
+                        },
+                    },
                     dayName: {
                         $switch: {
                             branches: [
@@ -221,7 +231,13 @@ export const GET = async (request) => {
                             default: "Unknown",
                         },
                     },
-                    time: { $dateToString: { format: "%H:%M", date: "$createdAt" } },
+                    time: {
+                        $dateToString: {
+                            format: "%H:%M",
+                            date: "$createdAt",
+                            timezone: tz,
+                        },
+                    },
                 },
             },
             {
@@ -237,6 +253,7 @@ export const GET = async (request) => {
             {
                 $group: {
                     _id: "$formattedDate",
+                    formattedDate: { $first: "$formattedDate" },
                     day: { $first: "$dayName" },
                     rawDate: { $first: "$createdAt" },
                     attendances: {
@@ -251,32 +268,36 @@ export const GET = async (request) => {
                 },
             },
             { $sort: { _id: -1 } },
+            {
+                $addFields: {
+                    date: {
+                        $switch: {
+                            branches: [
+                                { case: { $eq: ["$formattedDate", todayStr] }, then: "Today" },
+                                { case: { $eq: ["$formattedDate", yesterdayStr] }, then: "Yesterday" },
+                            ],
+                            default: {
+                                $dateToString: {
+                                    format: "%-d %b", // 👉 "6 Sep" (no leading 0)
+                                    date: "$rawDate",
+                                    timezone: tz,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    rawDate: 0,
+                    formattedDate: 0,
+                },
+            },
         ];
 
         const options = { page, limit };
         let result = await Attendance.aggregatePaginate(Attendance.aggregate(pipeline), options);
-
-        // Post-process date labels
-        result.docs = result.docs.map((doc) => {
-            const isoDate = doc._id;
-
-            if (isoDate === todayStr) {
-                doc.date = "Today";
-            } else if (isoDate === yesterdayStr) {
-                doc.date = "Yesterday";
-            } else {
-                const d = new Date(doc.rawDate);
-                doc.date = d.toLocaleDateString("en-US", {
-                    // year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                });
-            }
-
-            delete doc._id; // clean response
-            delete doc.rawDate;
-            return doc;
-        });
 
         return NextResponse.json({ success: true, data: { ...result } }, { status: 200 });
     } catch (error) {

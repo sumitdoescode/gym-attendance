@@ -10,31 +10,21 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
+import { useUserContext } from "@/contexts/UserContextProvider";
 
 const page = () => {
     const [fullName, setFullName] = useState("");
     const [gymCode, setGymCode] = useState("");
-    const [loading, setLoading] = useState(true);
     const [mutating, setMutating] = useState(false);
 
     const router = useRouter();
-
-    // checking if the profile is complete => redirect on dashboard
+    const { user, loading } = useUserContext();
     useEffect(() => {
-        const isProfileComplete = async () => {
-            try {
-                const { data } = await axios.get("/api/user/me");
-                if (data.success && data.data.user.isProfileComplete) {
-                    router.push("/dashboard");
-                }
-            } catch (error) {
-                console.error("Error checking profile completeness:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        isProfileComplete();
-    }, []);
+        // checking if the profile is complete => redirect on dashboard
+        if (user && user.isProfileComplete) {
+            router.push("/dashboard");
+        }
+    }, [user, loading, router]);
 
     const completeProfile = async () => {
         try {
@@ -60,7 +50,7 @@ const page = () => {
     };
     const isFormValid = fullName.trim().length > 3 && gymCode.trim().length > 0;
 
-    if (loading) {
+    if (loading || (user && user.isProfileComplete)) {
         return <Loading />;
     }
     return (

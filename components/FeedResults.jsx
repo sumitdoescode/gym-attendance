@@ -7,8 +7,6 @@ import Link from "next/link";
 import Image from "next/image";
 
 const FeedResults = ({ feed }) => {
-    console.log(feed);
-
     // first mapping them by days
     return feed.map((doc, index) => {
         return (

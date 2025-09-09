@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 
-const MarkAttendance = () => {
+const MarkAttendance = ({ fetchOwnUserProfile }) => {
     const [loading, setLoading] = useState(false);
     const markAttendance = async () => {
         try {
@@ -12,6 +12,7 @@ const MarkAttendance = () => {
             const { data } = await axios.post("/api/attendance");
             if (data.success) {
                 toast.success("Attendance marked successfully!");
+                fetchOwnUserProfile();
             }
         } catch (error) {
             toast.error("Failed to Mark Attendance", {
