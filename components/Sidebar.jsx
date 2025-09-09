@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Home, User, LogOut, CircleUserRound, Radio, UserPen, ShieldUser, ChartNoAxesCombined, LayoutDashboard } from "lucide-react";
+import { Home, Radio, UserPen, ShieldUser, ChartNoAxesCombined, LayoutDashboard } from "lucide-react";
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlignJustify } from "lucide-react";
-import { logoFont } from "@/app/layout";
+
 import Loading from "./Loading";
 import { useUserContext } from "@/contexts/UserContextProvider";
+import Logo from "./Logo";
 
 const Sidebar = () => {
     const [isAdmin, setIsAdmin] = useState(null);
@@ -45,10 +46,7 @@ const Sidebar = () => {
             <SheetContent side="left" className="w-[250px] p-0">
                 <SheetHeader className="p-2">
                     <SheetTitle>
-                        <Link href={"/"} className={`${logoFont.className} text-3xl font-bold tracking-tight uppercase text-primary`}>
-                            Strong
-                            <span className="text-white">ly</span>
-                        </Link>
+                        <Logo />
                     </SheetTitle>
                 </SheetHeader>
 

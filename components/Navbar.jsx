@@ -2,12 +2,12 @@
 import React from "react";
 import Container from "./Container";
 import Link from "next/link";
-import { logoFont } from "@/app/layout";
 import { Button } from "@/components/ui/button";
 import { SignUp, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { AlignJustify } from "lucide-react";
 import Sidebar from "./Sidebar";
 import { usePathname } from "next/navigation";
+import Logo from "./Logo";
 
 const Navbar = () => {
     const pathname = usePathname();
@@ -35,10 +35,7 @@ const Navbar = () => {
                         </div>
                     </SignedIn>
                     <SignedOut>
-                        <Link href={"/"} className={`${logoFont.className} text-3xl font-bold tracking-tight uppercase text-primary`}>
-                            Strong
-                            <span className="text-white">ly</span>
-                        </Link>
+                        <Logo />
                     </SignedOut>
                 </div>
             </Container>
