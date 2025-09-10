@@ -21,7 +21,18 @@ export const GET = async (request) => {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
 
-        const members = await Member.find();
+        const { searchParams } = new URL(request.url);
+        const q = searchParams.get("q");
+
+        let filter = {};
+        if (q && q.trim()) {
+            // Case-insensitive search on fullName or gymCode
+            filter = {
+                $or: [{ fullName: { $regex: q.trim(), $options: "i" } }, { gymCode: { $regex: q.trim(), $options: "i" } }],
+            };
+        }
+
+        const members = await Member.find(filter);
         return NextResponse.json({ success: true, message: "Members retrieved successfully", data: { members } }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });

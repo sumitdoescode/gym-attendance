@@ -14,7 +14,6 @@ const Page = () => {
     const fetchMembers = async () => {
         try {
             const { data } = await axios.get("/api/admin/analytics");
-            console.log(data.data);
             setAnalytics(data.data);
         } catch (error) {
             console.log("Error fetching members:", error);

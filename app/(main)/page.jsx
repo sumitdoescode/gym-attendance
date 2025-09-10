@@ -21,12 +21,22 @@ const page = () => {
                             {/* as it happens */}
                         </h1>
                         <p className="text-lg text-muted-foreground mt-3 text-center font-normal">See every member check-in as it happens — track attendance, trends, streaks in real time.</p>
-                        <Link href="/sign-in" className="mt-5 mx-auto flex w-fit text-base">
-                            <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer"}>
-                                <SignedOut>Get Started</SignedOut>
-                                <SignedIn>Go to Feed</SignedIn>
-                            </Button>
-                        </Link>
+
+                        <SignedOut>
+                            <Link href="/sign-in" className="mt-5 mx-auto flex w-fit text-base">
+                                <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer"}>
+                                    Get Started
+                                </Button>
+                            </Link>
+                        </SignedOut>
+
+                        <SignedIn>
+                            <Link href="/feed" className="mt-5 mx-auto flex w-fit text-base">
+                                <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer"}>
+                                    Go to Feed
+                                </Button>
+                            </Link>
+                        </SignedIn>
                     </div>
                 </Container>
             </section>

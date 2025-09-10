@@ -4,7 +4,6 @@ import { logoFont } from "@/lib/fonts";
 import Link from "next/link";
 
 const Logo = () => {
-    console.log(logoFont);
     return (
         <Link href={"/"} className={`${logoFont.className}  text-3xl font-bold tracking-tight uppercase text-primary`}>
             Strong

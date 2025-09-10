@@ -5,10 +5,10 @@ import { Target, Calendar, Flame } from "lucide-react";
 
 const ProfileStats = ({ totalAttendance, thisMonthAttendance, streak }) => {
     return (
-        <div className="mt-10 flex flex-col sm:flex-row gap-5">
+        <div className="mt-10 flex flex-col sm:flex-row gap-3">
             {/* first stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
-                <CardHeader className={"p-0"}>
+                <CardHeader className={"p-0 gap-0"}>
                     <div className={`w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <Target className={`w-6 h-6 text-primary`} />
                     </div>
@@ -21,7 +21,7 @@ const ProfileStats = ({ totalAttendance, thisMonthAttendance, streak }) => {
 
             {/* second stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
-                <CardHeader className={"p-0"}>
+                <CardHeader className={"p-0 gap-0"}>
                     <div className={`w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <Calendar className={`w-6 h-6 text-blue-500`} />
                     </div>
@@ -34,7 +34,7 @@ const ProfileStats = ({ totalAttendance, thisMonthAttendance, streak }) => {
 
             {/* third stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
-                <CardHeader className={"p-0"}>
+                <CardHeader className={"p-0 gap-0"}>
                     <div className={`w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <Flame className={`w-6 h-6 text-orange-500`} />
                     </div>

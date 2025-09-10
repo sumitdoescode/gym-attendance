@@ -7,7 +7,7 @@ const AnalyticsStats = ({ totalMembers, todayTotal, todayMorning, todayEvening }
         <div className="mt-10 flex flex-col md:flex-row gap-5">
             {/* first stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
-                <CardHeader className={"p-0"}>
+                <CardHeader className={"p-0 gap-0"}>
                     <div className="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center">
                         <Users className="w-6 h-6 text-rose-500" />
                     </div>
@@ -20,7 +20,7 @@ const AnalyticsStats = ({ totalMembers, todayTotal, todayMorning, todayEvening }
 
             {/* second stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
-                <CardHeader className={"p-0"}>
+                <CardHeader className={"p-0 gap-0"}>
                     <div className={`w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <CheckCheck className={`w-6 h-6 text-purple-500`} />
                     </div>
@@ -33,7 +33,7 @@ const AnalyticsStats = ({ totalMembers, todayTotal, todayMorning, todayEvening }
 
             {/* third stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
-                <CardHeader className={"p-0"}>
+                <CardHeader className={"p-0 gap-0"}>
                     <div className={`w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <Sun className={`w-6 h-6 text-blue-500`} />
                     </div>
@@ -46,7 +46,7 @@ const AnalyticsStats = ({ totalMembers, todayTotal, todayMorning, todayEvening }
 
             {/* fourth stat */}
             <Card className={"p-4 border-none gap-0 flex-1"}>
-                <CardHeader className={"p-0"}>
+                <CardHeader className={"p-0 gap-0"}>
                     <div className={`w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <SunMoon className={`w-6 h-6 text-orange-500`} />
                     </div>

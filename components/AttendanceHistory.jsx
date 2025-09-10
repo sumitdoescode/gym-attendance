@@ -19,11 +19,11 @@ const AttendanceHistory = ({ attendanceHistory }) => {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
                                             {/* <Avatar className="w-10 h-10">
-                                            <AvatarImage src={avatar} />
-                                            <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
-                                        </Avatar> */}
+                                                <AvatarImage src={avatar} />
+                                                <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
+                                            </Avatar> */}
                                             <div>
-                                                <h2 className="text-foreground text-lg sm:text-xl tracking-tight font-bold">{date}</h2>
+                                                <h2 className="text-foreground text-xl font-bold">{date}</h2>
                                                 <Badge variant="secondary" className={"mt-0.5 ml-0.5"}>
                                                     {day}
                                                 </Badge>

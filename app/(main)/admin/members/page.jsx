@@ -10,21 +10,26 @@ import MemberCard from "@/components/MemberCard";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import Loading from "@/components/Loading";
+import { useSearchParams } from "next/navigation";
 
 const Page = () => {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
 
     const fetchMembers = async () => {
         try {
-            const { data } = await axios.get("/api/admin/members");
+            const { data } = await axios.get(`/api/admin/members?q=${search ? search : ""}`);
             setMembers(data.data.members);
-            console.log(data.data.members);
         } catch (error) {
             console.log("Error fetching members:", error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSearch = () => {
+        fetchMembers();
     };
 
     useEffect(() => {
@@ -42,7 +47,7 @@ const Page = () => {
 
                 {/* total members count card */}
                 <Card className="mt-5 gap-0 p-4 border-none">
-                    <CardHeader className="m-0 p-0">
+                    <CardHeader className="m-0 p-0 gap-0">
                         <div className="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center">
                             <Users className="w-6 h-6 text-rose-500" />
                         </div>
@@ -58,9 +63,20 @@ const Page = () => {
 
                 {/* search member input */}
                 <div className="flex w-full items-center gap-2 mt-6">
-                    <Input type="text" placeholder="Search by name.." className="text-lg px-3 py-2" />
-                    <Button className="text-base">Search</Button>
+                    <Input type="text" placeholder="Search by name.." className="text-lg px-3 py-2" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    <Button className="text-base" onClick={handleSearch}>
+                        Search
+                    </Button>
                 </div>
+
+                {members.length === 0 && (
+                    <div className="mt-6 flex flex-col">
+                        <h1 className="text-2xl font-bold">No members found</h1>
+                        <p className="text-muted-foreground">
+                            No members found with the search query <b>{search}</b>.
+                        </p>
+                    </div>
+                )}
 
                 {/* list of all members */}
                 <div className="mt-6 flex flex-col gap-2">
