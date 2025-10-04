@@ -26,7 +26,7 @@ const layout = ({ children }) => {
         return <Loading />;
     }
 
-    if (!session.user || session.user.role !== "admin") {
+    if (!session?.user || session?.user?.role !== "admin") {
         return null; // prevent flashing before redirect
     }
 

@@ -31,7 +31,7 @@ const page = () => {
 
         // Redirect if profile is complete
         if (session.user.isProfileComplete) {
-            router.push("/dashboard");
+            return router.push("/dashboard");
         }
     }, [session, status, router]);
     3;
@@ -44,10 +44,9 @@ const page = () => {
                 fullName,
                 gymCode,
             });
-            console.log("completing profile");
-            console.log("redircting to dashboard");
-            router.push("/dashboard");
-            toast.success("✅ Profile completed successfully");
+
+            window.location.href = "/dashboard";
+            return toast.success("✅ Profile completed successfully");
         } catch (error) {
             toast.error("❌ Failed to complete profile", {
                 title: error?.response?.data?.message || "Try again later",
