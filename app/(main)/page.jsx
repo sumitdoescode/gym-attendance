@@ -62,7 +62,7 @@ const page = () => {
                         </h2>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-8 mt-16">
+                    <div className="grid md:grid-cols-3 gap-8 mt-20">
                         <Card className={"border border-[#1F1F1F] hover:border-[#00FF88]/30 transition-all duration-300 group gap-1.5 p-4"}>
                             <CardHeader className={"mb-0 p-0"}>
                                 <div className="w-16 h-16 bg-[#00FF88]/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#00FF88]/20 transition-all duration-300">
@@ -118,7 +118,7 @@ const page = () => {
                         {/* <p className="text-lg text-muted-foreground font-medium max-w-2xl mx-auto mt-3">Get started in minutes, not hours</p> */}
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mt-16">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mt-20">
                         <div className="text-center group">
                             <div className="w-20 h-20 bg-gradient-to-br from-[#00FF88]/20 to-[#00FF88]/10 rounded-full flex items-center justify-center mx-auto border border-[#00FF88]/30 group-hover:scale-110 transition-all duration-300">
                                 <span className="text-2xl font-black text-[#00FF88]">1</span>
@@ -165,7 +165,7 @@ const page = () => {
                         {/* <p className="text-base text-muted-foreground mt-3 leading-relaxed">Transform your gym experience with modern attendance</p> */}
                     </div>
 
-                    <div className="flex flex-col md:flex-row gap-10 mt-16 justify-between">
+                    <div className="flex flex-col md:flex-row gap-10 mt-20 justify-between">
                         <div className="flex md:flex-col items-start gap-4">
                             <div>
                                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-1.5">
