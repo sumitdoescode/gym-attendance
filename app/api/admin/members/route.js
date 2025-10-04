@@ -2,21 +2,24 @@ import Member from "@/models/Member";
 
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
 import User from "@/models/User";
+import { auth } from "@/auth";
 
 // GET all members
 // GET => /api/admin/members
-export const GET = async (request) => {
+export async function GET(request) {
     try {
         await connectDB();
-        const { userId } = await auth();
-        if (!userId) {
+
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = session.user.id;
+
         // check if the user is an admin
-        const user = await User.findOne({ clerkId: userId });
+        const user = await User.findById(userId);
         if (!user || user.role !== "admin") {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
@@ -37,21 +40,26 @@ export const GET = async (request) => {
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}
 
 // Create Member
 // POST => /api/admin/members
-export const POST = async (request) => {
+export async function POST(request) {
     try {
         await connectDB();
 
-        const { userId } = await auth();
+        const session = await auth();
+        if (!session) {
+            return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+        }
+
+        const userId = session.user.id;
         if (!userId) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
         // check if user is as admin
-        const user = await User.findOne({ clerkId: userId });
+        const user = await User.findById(userId);
         if (!user || user.role !== "admin") {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
@@ -72,4 +80,4 @@ export const POST = async (request) => {
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}

@@ -10,10 +10,27 @@ import AttendanceHistory from "@/components/AttendanceHistory";
 import Loading from "@/components/Loading";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { useSession, signIn } from "next-auth/react";
 
 const page = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
+        if (status === "loading") return; // wait for session to load
+
+        if (!session) {
+            signIn("google");
+            return;
+        }
+
+        // this means we are logged in here
+        // if profile is complete, redirect to complete-profile
+        if (!session.user.isProfileComplete) {
+            router.push("/complete-profile");
+        }
+    }, [session, status]);
 
     const router = useRouter();
 
@@ -27,9 +44,6 @@ const page = () => {
         } catch (error) {
             console.log(error.response);
             // if user profile is not complete, redirect him to complete profile page
-            if (!error?.response?.data.isProfileComplete) {
-                router.push("/complete-profile");
-            }
         } finally {
             setLoading(false);
         }

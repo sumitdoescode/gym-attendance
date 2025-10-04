@@ -8,12 +8,23 @@ import axios from "axios";
 import FeedResults from "@/components/FeedResults";
 import { pusherClient } from "@/lib/pusher-client";
 import MarkAttendance from "@/components/MarkAttendance";
+import { useSession, signIn } from "next-auth/react";
 
 const page = () => {
     const [feed, setFeed] = useState([]);
     const [loading, setLoading] = useState(true);
     const [hasNextPage, setHasNextPage] = useState(true);
     const [nextPage, setNextPage] = useState(2);
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
+        if (status === "loading") return; // wait for session to load
+
+        if (!session) {
+            signIn("google");
+            return;
+        }
+    }, [session, status]);
 
     const fetchFeed = async (pageNum = 1) => {
         try {
@@ -21,7 +32,6 @@ const page = () => {
             if (data.success) {
                 if (pageNum === 1) {
                     setFeed(data.data.docs);
-                    console.log(data.data.docs);
                 } else {
                     setFeed((prev) => [...prev, ...data.data.docs]);
                 }

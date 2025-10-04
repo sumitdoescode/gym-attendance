@@ -1,20 +1,21 @@
 import User from "@/models/User";
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
+import { auth } from "@/auth";
 
 // api/user/[username]
 // get user profile by username (requires auth) + attendance history
-export const GET = async (request, { params }) => {
+export async function GET(request, { params }) {
     try {
         await connectDB();
 
-        // ✅ must be logged in
-        const { userId } = await auth();
-        if (!userId) {
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
+
+        const userId = session.user.id;
 
         const { username } = await params;
 
@@ -99,4 +100,4 @@ export const GET = async (request, { params }) => {
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}

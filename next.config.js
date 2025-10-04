@@ -16,7 +16,6 @@ const nextConfig = {
             },
         ],
     },
-    experimental: {},
 };
 
-export default nextConfig;
+module.exports = nextConfig;

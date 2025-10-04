@@ -3,19 +3,23 @@ import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
 import User from "@/models/User";
 import Member from "@/models/Member";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 
 // GET /api/admin/analytics
 // get overall analytics (morning + evening attendance today, last 10 days breakdown, total members)
-export const GET = async () => {
+export async function GET() {
     try {
         await connectDB();
-        const { userId } = await auth();
-        if (!userId) {
+
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
+
+        const userId = session.user.id;
+
         // check if the user is an admin
-        const user = await User.findOne({ clerkId: userId });
+        const user = await User.findById(userId);
         if (!user) {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
         }
@@ -144,4 +148,4 @@ export const GET = async () => {
     } catch (err) {
         return NextResponse.json({ success: false, message: err.message || "Internal server error" }, { status: 500 });
     }
-};
+}

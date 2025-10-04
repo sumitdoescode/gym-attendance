@@ -1,23 +1,29 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Home, Radio, UserPen, ShieldUser, ChartNoAxesCombined, LayoutDashboard } from "lucide-react";
+import { Home, Radio, UserPen, ShieldUser, ChartNoAxesCombined, LayoutDashboard, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlignJustify } from "lucide-react";
-
+import { useSession, signIn, signOut } from "next-auth/react";
 import Loading from "./Loading";
-import { useUserContext } from "@/contexts/UserContextProvider";
 import Logo from "./Logo";
 
 const Sidebar = () => {
     const [isAdmin, setIsAdmin] = useState(null);
-    const { user, loading } = useUserContext();
+
+    const { data: session, status } = useSession();
 
     useEffect(() => {
-        if (!loading && user && user.role === "admin") {
+        if (status === "loading") return; // wait for session to load
+
+        if (!session) return;
+
+        // this means we are logged in here
+        // if user is  admin
+        if (session.user.role === "admin") {
             setIsAdmin(true);
         }
-    }, [user, loading]);
+    }, [session, status]);
 
     // Sidebar menu items
     const items = [
@@ -66,14 +72,12 @@ const Sidebar = () => {
                         )}
 
                         {/* Logout */}
-                        {/* <div className="px-2 py-1 hover:bg-stone-800 duration-200 ease-in-out rounded-md cursor-pointer">
-                            <SignOutButton fallbackredirecturl="/sign-in">
-                                <div className="flex items-center gap-2">
-                                    <LogOut size={22} />
-                                    <span className="text-xl">Logout</span>
-                                </div>
-                            </SignOutButton>
-                        </div> */}
+                        <div className="px-2 py-1 hover:bg-stone-800 duration-200 ease-in-out rounded-md cursor-pointer">
+                            <div className="flex items-center gap-2" onClick={() => signOut()}>
+                                <LogOut size={22} />
+                                <span className="text-xl">Logout</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -81,12 +85,12 @@ const Sidebar = () => {
                 {/* <SheetFooter>
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
-                            <AvatarImage src={user?.profileImage?.url} alt={user?.username} />
-                            <AvatarFallback>{user?.username.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={session.user?.image} alt={user?.username} />
+                            <AvatarFallback>{user?.username?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
-                            <span className="truncate font-semibold">{user?.username}</span>
-                            <span className="truncate text-xs">{user?.email}</span>
+                            <span className="truncate font-semibold">{session.user?.username}</span>
+                            <span className="truncate text-xs">{session.user?.email}</span>
                         </div>
                     </div>
                 </SheetFooter> */}

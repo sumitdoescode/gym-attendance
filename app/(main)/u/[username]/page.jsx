@@ -10,16 +10,27 @@ import ProfileStats from "@/components/ProfileStats";
 import AttendanceHistory from "@/components/AttendanceHistory";
 import { useParams } from "next/navigation";
 import Loading from "@/components/Loading";
+import { useSession, signIn } from "next-auth/react";
 
 const page = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+    const { data: session, status } = useSession();
+
+    useEffect(() => {
+        if (status === "loading") return; // wait for session to load
+
+        if (!session) {
+            signIn("google");
+            return;
+        }
+    }, [session, status]);
 
     const params = useParams();
     const { username } = params;
 
-    const fetchOwnUserProfile = async () => {
+    const fetchUserProfile = async () => {
         try {
             const { data } = await axios.get(`/api/user/${username}`);
             if (data.success) {
@@ -36,7 +47,7 @@ const page = () => {
         }
     };
     useEffect(() => {
-        fetchOwnUserProfile();
+        fetchUserProfile();
     }, []);
     if (loading) {
         return <Loading />;

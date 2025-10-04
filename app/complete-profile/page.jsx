@@ -5,36 +5,49 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/Container";
-import { User, Key, ArrowRight } from "lucide-react";
+import { User, Key, ArrowRight, PenTool } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
-import { useUserContext } from "@/contexts/UserContextProvider";
+import { useSession, signIn } from "next-auth/react";
 
 const page = () => {
+    const [username, setUsername] = useState("");
     const [fullName, setFullName] = useState("");
     const [gymCode, setGymCode] = useState("");
     const [mutating, setMutating] = useState(false);
 
+    const { data: session, status } = useSession();
     const router = useRouter();
-    const { user, loading } = useUserContext();
+
     useEffect(() => {
-        // checking if the profile is complete => redirect on dashboard
-        if (user && user.isProfileComplete) {
+        if (status === "loading") return; // wait for session to load
+
+        if (!session) {
+            signIn("google");
+            return;
+        }
+
+        // Redirect if profile is complete
+        if (session.user.isProfileComplete) {
             router.push("/dashboard");
         }
-    }, [user, loading, router]);
+    }, [session, status, router]);
+    3;
 
     const completeProfile = async () => {
         try {
             setMutating(true);
             const { data } = await axios.post("/api/user", {
+                username,
                 fullName,
                 gymCode,
             });
-            toast.success("✅ Profile completed successfully");
+            console.log("completing profile");
+            console.log("redircting to dashboard");
             router.push("/dashboard");
+            toast.success("✅ Profile completed successfully");
         } catch (error) {
             toast.error("❌ Failed to complete profile", {
                 title: error?.response?.data?.message || "Try again later",
@@ -48,9 +61,9 @@ const page = () => {
         e.preventDefault();
         completeProfile();
     };
-    const isFormValid = fullName.trim().length > 3 && gymCode.trim().length > 0;
+    const isFormValid = fullName.trim().length > 3 && gymCode.trim().length > 0 && username.trim().length > 3;
 
-    if (loading || (user && user.isProfileComplete)) {
+    if (status === "loading") {
         return <Loading />;
     }
     return (
@@ -72,10 +85,23 @@ const page = () => {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Full Name */}
                             <div className="space-y-2">
                                 <div className="relative group">
                                     <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 w-4 h-4 transition-colors group-focus-within:text-primary" />
+                                    <Input
+                                        id="username"
+                                        type="text"
+                                        placeholder="Choose a username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className={`pl-12 h-12 bg-zinc-900/50 border-zinc-800 text-foreground placeholder:text-zinc-500 focus:border-primary focus:ring focus:ring-primary/20 transition-all duration-200`}
+                                    />
+                                </div>
+                            </div>
+                            {/* Full Name */}
+                            <div className="space-y-2">
+                                <div className="relative group">
+                                    <PenTool className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 w-4 h-4 transition-colors group-focus-within:text-primary" />
                                     <Input
                                         id="fullName"
                                         type="text"

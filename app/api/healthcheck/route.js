@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
-export const GET = async (req) => {
-    if (!req) {
-        return NextResponse.json({ success: false, message: "Health Status is not good" }, { status: 400 });
+export async function GET() {
+    try {
+        return NextResponse.json({ success: true, message: "Health status is good", timestamp: new Date().toISOString() }, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ success: false, message: "Health check failed", error: error.message }, { status: 500 });
     }
-    return NextResponse.json({ success: true, message: "Health status is good" }, { status: 200 });
-};
+}

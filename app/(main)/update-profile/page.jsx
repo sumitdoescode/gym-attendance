@@ -5,31 +5,40 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/Container";
-import { User, Key, ArrowRight } from "lucide-react";
+import { User, Key, ArrowRight, PenTool } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
-import { useUserContext } from "@/contexts/UserContextProvider";
+import { useSession, signIn } from "next-auth/react";
 
 const page = () => {
+    const [username, setUsername] = useState("");
     const [fullName, setFullName] = useState("");
     const [gymCode, setGymCode] = useState("");
     const [updating, setUpdating] = useState(false);
 
     const router = useRouter();
-    const { user, loading } = useUserContext();
+    const { data: session, status } = useSession();
+
     useEffect(() => {
-        if (user) {
-            setFullName(user?.fullName);
-            setGymCode(user?.gymCode);
+        if (status === "loading") return; // wait for session to load
+
+        if (!session) {
+            signIn("google");
+            return;
         }
-    }, [user]);
+        // this means we are logged in here
+        setFullName(session.user.fullName);
+        setGymCode(session.user.gymCode);
+        setUsername(session.user.username);
+    }, [session, status]);
 
     const updateProfile = async () => {
         try {
             setUpdating(true);
             const { data } = await axios.post("/api/user", {
+                username,
                 fullName,
                 gymCode,
             });
@@ -49,8 +58,8 @@ const page = () => {
         updateProfile();
     };
 
-    if (loading) return <Loading />;
-    const isFormValid = fullName?.trim().length > 3 && gymCode?.trim().length > 0;
+    if (status === "loading") return <Loading />;
+    const isFormValid = fullName?.trim().length > 3 && gymCode?.trim().length > 0 && username?.trim().length > 3;
     return (
         <section className="py-20">
             <Container>
@@ -70,10 +79,25 @@ const page = () => {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Full Name */}
+                            {/* Username */}
                             <div className="space-y-2">
                                 <div className="relative group">
                                     <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 w-4 h-4 transition-colors group-focus-within:text-primary" />
+                                    <Input
+                                        id="fullName"
+                                        type="text"
+                                        placeholder="Enter your username"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className={`pl-12 h-12 bg-zinc-900/50 border-zinc-800 text-foreground placeholder:text-zinc-500 focus:border-primary focus:ring focus:ring-primary/20 transition-all duration-200`}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Full Name */}
+                            <div className="space-y-2">
+                                <div className="relative group">
+                                    <PenTool className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-500 w-4 h-4 transition-colors group-focus-within:text-primary" />
                                     <Input
                                         id="fullName"
                                         type="text"

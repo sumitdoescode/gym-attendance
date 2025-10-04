@@ -2,15 +2,14 @@ import mongoose, { Schema, model } from "mongoose";
 
 const userSchema = new mongoose.Schema(
     {
-        clerkId: { type: String, required: true, unique: true },
         email: { type: String, required: true, unique: true },
-        username: { type: String, required: true, unique: true },
+        username: { type: String, unique: true, default: "" },
         fullName: { type: String },
         gymCode: { type: String, unique: true },
         avatar: { type: String },
         role: {
             type: String,
-            enum: ["member", "admin"], // ✅ restrict values
+            enum: ["member", "admin"],
             default: "member",
         },
         isProfileComplete: { type: Boolean, default: false },

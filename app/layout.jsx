@@ -1,8 +1,9 @@
 import { Urbanist } from "next/font/google";
 import { Bebas_Neue } from "next/font/google";
 import "./globals.css";
-import Provider from "@/components/Provider";
-import UserContextProvider from "@/contexts/UserContextProvider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { SessionProvider } from "next-auth/react";
 
 const urbanist = Urbanist({ subsets: ["latin"], variable: "--font-urbanist" });
 
@@ -13,11 +14,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body className={`${urbanist.variable} antialiased`}>
-                <Provider>
-                    <UserContextProvider>{children}</UserContextProvider>
-                </Provider>
+                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+                    <SessionProvider>{children}</SessionProvider>
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     );

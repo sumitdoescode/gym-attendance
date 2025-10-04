@@ -1,25 +1,32 @@
 "use client";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/Loading";
-import { useUserContext } from "@/contexts/UserContextProvider";
+import { useSession, signIn } from "next-auth/react";
 
 const layout = ({ children }) => {
     const router = useRouter();
-    const { user, loading } = useUserContext();
+    const { data: session, status } = useSession();
 
     useEffect(() => {
-        if (!loading && user && user.role !== "admin") {
+        if (status === "loading") return; // wait for session to load
+
+        if (!session) {
+            signIn("google");
+            return;
+        }
+
+        // this means we are logged in here
+        if (!session.user || session.user.role !== "admin") {
             router.push("/");
         }
-    }, [loading, user]);
+    }, [session, status, router]);
 
-    if (loading) {
+    if (status === "loading") {
         return <Loading />;
     }
 
-    if (!user || user.role !== "admin") {
+    if (!session.user || session.user.role !== "admin") {
         return null; // prevent flashing before redirect
     }
 

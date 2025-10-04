@@ -1,21 +1,26 @@
 import Member from "@/models/Member";
 import User from "@/models/User";
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { isValidObjectId } from "mongoose";
 import connectDB from "@/lib/db";
 import Attendance from "@/models/Attendance";
+import { auth } from "@/auth";
+
 // api/user => GET
 // get own user profile + attendance history (dashboard)
+
 export const GET = async (request) => {
     try {
         await connectDB();
-        const { userId } = await auth();
-        if (!userId) {
+        const session = await auth();
+
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
-        const user = await User.findOne({ clerkId: userId }).select("-clerkId -gymCode").lean();
+        const userId = session.user.id;
+
+        const user = await User.findById(userId).select("-clerkId -gymCode").lean();
 
         if (!user) {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
@@ -70,7 +75,6 @@ export const GET = async (request) => {
                     user: {
                         ...user,
                         attendanceHistory: history,
-                        // user.stats already has totalAttendance, thisMonthAttendance, streak
                     },
                 },
             },
@@ -82,23 +86,32 @@ export const GET = async (request) => {
 };
 
 // api/user => POST
-// complete profile by providing gymCode and name in correct pair
+// complete profile by providing gymCode and name and by choosing a username
 export const POST = async (request) => {
     try {
         await connectDB();
-        const { userId } = await auth();
-        if (!userId) {
+
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
-        const user = await User.findOne({ clerkId: userId });
+        const userId = session.user.id;
+
+        const user = await User.findById(userId);
         if (!user) {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
         }
 
-        const { fullName, gymCode } = await request.json();
-        if (!fullName?.trim() || !gymCode?.trim()) {
-            return NextResponse.json({ success: false, message: "Full Name and Gym Code are required" }, { status: 400 });
+        const { username, fullName, gymCode } = await request.json();
+        if (!fullName?.trim() || !gymCode?.trim() || !username?.trim()) {
+            return NextResponse.json({ success: false, message: "Full Name, Gym Code and Username are required" }, { status: 400 });
+        }
+
+        // check if username already exists
+        const existingUser = await User.findOne({ username: username?.trim() });
+        if (existingUser) {
+            return NextResponse.json({ success: false, message: "Username already exists" }, { status: 400 });
         }
 
         // check if member exists in correct fullName, gymCode pair
@@ -110,6 +123,7 @@ export const POST = async (request) => {
         // update the user profile
         user.gymCode = gymCode.trim();
         user.fullName = fullName.trim();
+        user.username = username.trim();
         user.isProfileComplete = true;
         await user.save();
 
@@ -121,37 +135,48 @@ export const POST = async (request) => {
 
 // api/user => PATCH
 // Update user profile gymCode, name
-export const PATCH = async (request) => {
+export async function PATCH(request) {
     try {
         await connectDB();
-        const { userId } = await auth();
-        if (!userId) {
+
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
-        const user = await User.findOne({ clerkId: userId });
+        const userId = session.user.id;
+
+        const user = await User.findById(userId);
         if (!user) {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
         }
 
-        const { name, gymCode } = await request.json();
-        if (!name?.trim() && !gymCode?.trim()) {
-            return NextResponse.json({ success: false, message: "Name or Gym Code is required" }, { status: 400 });
+        const { username, name, gymCode } = await request.json();
+        if (!username?.trim() || !name?.trim() || !gymCode?.trim()) {
+            return NextResponse.json({ success: false, message: "Username, Name and Gym Code are required" }, { status: 400 });
         }
+
+        // check if username already exists
+        const existingUser = await User.findOne({ username: username?.trim() });
+        if (existingUser) {
+            return NextResponse.json({ success: false, message: "Username already exists" }, { status: 400 });
+        }
+
         // check if name and gymCode exists in correct pair
         const validMember = await Member.findOne({ name: name?.trim(), gymCode: gymCode?.trim() });
         if (!validMember) {
             return NextResponse.json({ success: false, message: "Invalid name or gym code" }, { status: 400 });
         }
-
+        // update the user profile
         user.name = name?.trim();
         user.gymCode = gymCode?.trim();
+        user.username = username?.trim();
         await user.save();
 
         return NextResponse.json({ success: true, message: "Profile Updated Successfully" }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}
 
 // we are not letting user to delete their (name and gymCode)

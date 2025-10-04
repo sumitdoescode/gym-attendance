@@ -2,22 +2,23 @@ import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
 import User from "@/models/User";
 import Attendance from "@/models/Attendance";
-import Member from "@/models/Member";
-import { auth } from "@clerk/nextjs/server";
 import connectDB from "@/lib/db";
 import { pusherServer } from "@/lib/pusher";
-
+import { auth } from "@/auth";
 // api/attendance => POST
 // create an attendance or mark an attendance
-export const POST = async (request) => {
+export async function POST(request) {
     try {
         await connectDB();
-        const { userId } = await auth();
-        if (!userId) {
+
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
-        const user = await User.findOne({ clerkId: userId });
+        const userId = session.user.id;
+
+        const user = await User.findById(userId);
         if (!user) {
             return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
         }
@@ -181,11 +182,11 @@ export const POST = async (request) => {
         console.error("Attendance POST error:", error);
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}
 
 // attendance feed
 // api/attendance => GET
-export const GET = async (request) => {
+export async function GET(request) {
     try {
         await connectDB();
 
@@ -303,4 +304,4 @@ export const GET = async (request) => {
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}

@@ -3,20 +3,22 @@ import { NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 
 // Update a member
-export const PATCH = async (request, { params }) => {
+export async function PATCH(request, { params }) {
     try {
         await connectDB();
 
-        const { userId } = await auth();
-        if (!userId) {
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = session.user.id;
+
         // check if user is an admin
-        const user = await User.findOne({ clerkId: userId });
+        const user = await User.findById(userId);
         if (!user || user.role !== "admin") {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
@@ -48,20 +50,22 @@ export const PATCH = async (request, { params }) => {
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}
 
 // delete a member
-export const DELETE = async (request, { params }) => {
+export async function DELETE(request, { params }) {
     try {
         await connectDB();
 
-        const { userId } = await auth();
-        if (!userId) {
+        const session = await auth();
+        if (!session) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
+        const userId = session.user.id;
+
         // check if the user is admin
-        const user = await User.findOne({ clerkId: userId });
+        const user = await User.findById(userId);
         if (!user || user.role !== "admin") {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
@@ -78,4 +82,4 @@ export const DELETE = async (request, { params }) => {
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
-};
+}

@@ -1,12 +1,21 @@
+"use client";
 import React from "react";
 import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CheckCircle, BarChart3, Zap, UserCheck, Users, TrendingUp, Shield, Clock } from "lucide-react";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { SignUp, SignedIn, SignedOut } from "@clerk/nextjs";
+// import { useSession, signIn } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
+import Loading from "@/components/Loading";
 
 const page = () => {
+    const { data: session, status } = useSession();
+
+    if (status === "loading") {
+        return <Loading />;
+    }
+
     return (
         <>
             {/* hero section */}
@@ -22,21 +31,24 @@ const page = () => {
                         </h1>
                         <p className="text-lg text-muted-foreground mt-3 text-center font-normal">See every member check-in as it happens — track attendance, trends, streaks in real time.</p>
 
-                        <SignedOut>
-                            <Link href="/sign-in" className="mt-5 mx-auto flex w-fit text-base">
+                        {session ? (
+                            // if you are logged in
+                            <Link href="/dashboard" className="mt-5 mx-auto flex w-fit text-base">
                                 <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer"}>
-                                    Get Started
+                                    Go to Dashboard
                                 </Button>
                             </Link>
-                        </SignedOut>
+                        ) : (
+                            <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer mt-5 mx-auto flex w-fit"} onClick={() => signIn("google", { callbackUrl: "/complete-profile" })}>
+                                Get Started
+                            </Button>
+                        )}
 
-                        <SignedIn>
-                            <Link href="/feed" className="mt-5 mx-auto flex w-fit text-base">
-                                <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer"}>
-                                    Go to Feed
-                                </Button>
-                            </Link>
-                        </SignedIn>
+                        {/* <Link href="/feed" className="mt-5 mx-auto flex w-fit text-base">
+                            <Button size={"lg"} className={"bg-primary text-base rounded-full font-medium text-primary-foreground cursor-pointer"}>
+                                Go to Feed
+                            </Button>
+                        </Link> */}
                     </div>
                 </Container>
             </section>
@@ -201,11 +213,19 @@ const page = () => {
                             Ready to Start <span className="text-primary">Tracking?</span>
                         </h2>
                         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-6">Thousands are transforming fitness with smart tracking—join them.</p>
-                        <Link href="/feed" className="mt-8 inline-block">
-                            <Button className={"rounded-full text-base text-primary-foreground font-semibold cursor-pointer"} size={"lg"}>
+                        {session ? (
+                            // if logged in
+                            <Link href="/feed" className="mt-8 inline-block">
+                                <Button className={"rounded-full text-base text-primary-foreground font-semibold cursor-pointer"} size={"lg"}>
+                                    Go to Dashboard
+                                </Button>
+                            </Link>
+                        ) : (
+                            // if not logged in
+                            <Button className={"rounded-full text-base text-primary-foreground font-semibold cursor-pointer mt-8 inline-block"} size={"lg"} onClick={() => signIn("google", { callbackUrl: "/complete-profile" })}>
                                 Get Started Now
                             </Button>
-                        </Link>
+                        )}
                     </div>
                 </Container>
             </section>
