@@ -1,11 +1,8 @@
-import { Urbanist } from "next/font/google";
-import { Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
-
-const urbanist = Urbanist({ subsets: ["latin"], variable: "--font-urbanist" });
+import { urbanist } from "@/lib/fonts";
 
 export const metadata = {
     title: "Strongly Check-in",
