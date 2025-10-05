@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation";
 
 const Page = () => {
     const [members, setMembers] = useState([]);
+    const [totalMembersCount, setTotalMembersCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
@@ -21,6 +22,7 @@ const Page = () => {
         try {
             const { data } = await axios.get(`/api/admin/members?q=${search ? search : ""}`);
             setMembers(data.data.members);
+            setTotalMembersCount(data.data.totalMembersCount);
         } catch (error) {
             console.log("Error fetching members:", error);
         } finally {
@@ -53,7 +55,7 @@ const Page = () => {
                         </div>
                     </CardHeader>
                     <CardContent className="text-right p-0 mt-0">
-                        <h1 className="text-foreground font-bold text-4xl tracking-tight sm:mt-5">{members.length}</h1>
+                        <h1 className="text-foreground font-bold text-4xl tracking-tight sm:mt-5">{totalMembersCount}</h1>
                         <h2 className="text-muted-foreground text-base">Total Members</h2>
                     </CardContent>
                 </Card>
@@ -70,7 +72,7 @@ const Page = () => {
                 </div>
 
                 {members.length === 0 && (
-                    <div className="mt-6 flex flex-col">
+                    <div className="mt-10 ml-1 flex flex-col">
                         <h1 className="text-2xl font-bold">No members found</h1>
                         <p className="text-muted-foreground">
                             No members found with the search query <b>{search}</b>.

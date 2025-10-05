@@ -68,7 +68,7 @@ const MemberCard = ({ _id, fullName, gymCode, phone, fetchMembers }) => {
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader className="mb-5">
-                                    <DialogTitle className="text-2xl">Add Member</DialogTitle>
+                                    <DialogTitle className="text-2xl">Update Member</DialogTitle>
                                 </DialogHeader>
 
                                 {/* Full Name */}

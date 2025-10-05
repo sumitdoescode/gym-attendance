@@ -36,7 +36,8 @@ export async function GET(request) {
         }
 
         const members = await Member.find(filter);
-        return NextResponse.json({ success: true, message: "Members retrieved successfully", data: { members } }, { status: 200 });
+        const totalMembersCount = await Member.countDocuments();
+        return NextResponse.json({ success: true, message: "Members retrieved successfully", data: { members, totalMembersCount } }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ success: false, message: error.message || "Internal Server Error" }, { status: 500 });
     }
