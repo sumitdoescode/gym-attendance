@@ -13,7 +13,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${urbanist.variable} antialiased`}>
+            <body className={`${urbanist.variable} antialiased flex flex-col min-h-screen`}>
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
                     <SessionProvider>
                         {children}

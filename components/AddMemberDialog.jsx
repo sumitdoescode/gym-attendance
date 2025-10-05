@@ -21,7 +21,7 @@ const AddMemberDialog = ({ fetchMembers }) => {
         try {
             setLoading(true);
             await axios.post("/api/admin/members", { fullName, gymCode, phone });
-            toast.success("✅ Member added successfully!");
+            toast.success("Member added successfully!");
             fetchMembers();
 
             // Reset form

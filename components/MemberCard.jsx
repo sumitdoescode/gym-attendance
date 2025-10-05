@@ -33,10 +33,10 @@ const MemberCard = ({ _id, fullName, gymCode, phone, fetchMembers }) => {
             await axios.patch(`/api/admin/members/${_id}`, { fullName: fullNameState, gymCode: gymCodeState, phone: phoneState });
             fetchMembers();
             setOpen(false);
-            toast.success("✅ Member updated successfully");
+            toast.success("Member updated successfully");
         } catch (error) {
             console.log(error);
-            toast.error("❌ Failed to update member", {
+            toast.error("Failed to update member", {
                 description: error?.response?.data?.message || "Try again later",
             });
         } finally {

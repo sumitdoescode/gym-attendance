@@ -31,7 +31,7 @@ const Page = () => {
     }
 
     return (
-        <section className="py-24">
+        <section className="py-24 grow">
             <Container>
                 <h1 className="text-4xl font-bold">Analytics</h1>
 

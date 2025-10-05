@@ -55,7 +55,7 @@ const page = () => {
 
     if (notFound) {
         return (
-            <section className="min-h-screen flex items-center justify-center text-center py-24">
+            <section className="min-h-screen flex items-center justify-center text-center py-24 grow">
                 <Container>
                     <div className="-mt-5 max-w-sm mx-auto">
                         <h1 className="text-5xl font-bold text-foreground">User Not Found</h1>
@@ -73,7 +73,7 @@ const page = () => {
     }
 
     return (
-        <section className="py-24">
+        <section className="py-24 grow">
             <Container>
                 {/* Profile Header */}
                 <div className="flex justify-between items-start">

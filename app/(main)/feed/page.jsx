@@ -81,7 +81,7 @@ const page = () => {
         return <Loading />;
     }
     return (
-        <section className="py-14">
+        <section className="py-14 grow">
             <Container>
                 <MarkAttendance />
                 <div className="flex items-center justify-between mt-10">

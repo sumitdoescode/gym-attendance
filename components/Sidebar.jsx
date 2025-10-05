@@ -7,6 +7,7 @@ import { AlignJustify } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Loading from "./Loading";
 import Logo from "./Logo";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Sidebar = () => {
     const [isAdmin, setIsAdmin] = useState(null);
@@ -82,18 +83,18 @@ const Sidebar = () => {
                 </div>
 
                 {/* Footer: User Info */}
-                {/* <SheetFooter>
+                <SheetFooter>
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                        <Avatar className="h-8 w-8 rounded-lg">
-                            <AvatarImage src={session.user?.image} alt={user?.username} />
-                            <AvatarFallback>{user?.username?.charAt(0)}</AvatarFallback>
+                        <Avatar className="h-10 w-10 rounded-lg">
+                            <AvatarImage src={session.user?.avatar} alt={session?.user?.username} />
+                            <AvatarFallback>{session?.user?.username?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
-                            <span className="truncate font-semibold">{session.user?.username}</span>
-                            <span className="truncate text-xs">{session.user?.email}</span>
+                            <span className="truncate font-semibold text-lg">{session.user?.username}</span>
+                            <span className="truncate text-sm -mt-1">{session.user?.email}</span>
                         </div>
                     </div>
-                </SheetFooter> */}
+                </SheetFooter>
             </SheetContent>
         </Sheet>
     );

@@ -55,7 +55,7 @@ const page = () => {
         return <Loading />;
     }
     return (
-        <section className="py-24">
+        <section className="py-24 grow">
             <Container>
                 {/* Profile Header */}
                 <div className="flex justify-between items-start">

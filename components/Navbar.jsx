@@ -38,7 +38,7 @@ const Navbar = () => {
                                 )}
                                 {/* You can add a user avatar or menu here */}
                                 <Avatar>
-                                    <AvatarImage src={session.user?.image} alt={session.user?.username} />
+                                    <AvatarImage src={session.user?.avatar} alt={session.user?.username} />
                                     <AvatarFallback>{session.user?.username?.charAt(0) || "U"}</AvatarFallback>
                                 </Avatar>
                             </div>

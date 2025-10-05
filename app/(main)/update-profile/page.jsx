@@ -42,7 +42,7 @@ const page = () => {
                 fullName,
                 gymCode,
             });
-            toast.success("✅ Profile updated successfully");
+            toast.success("Profile updated successfully");
             router.push("/dashboard");
         } catch (error) {
             toast.error("❌ Failed to update profile", {
@@ -61,7 +61,7 @@ const page = () => {
     if (status === "loading") return <Loading />;
     const isFormValid = fullName?.trim().length > 3 && gymCode?.trim().length > 0 && username?.trim().length > 3;
     return (
-        <section className="py-20">
+        <section className="py-20 grow">
             <Container>
                 {/* <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6"> */}
                 <div className="w-full max-w-sm mx-auto">

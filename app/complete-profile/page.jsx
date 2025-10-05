@@ -17,6 +17,7 @@ const page = () => {
     const [fullName, setFullName] = useState("");
     const [gymCode, setGymCode] = useState("");
     const [mutating, setMutating] = useState(false);
+    const [redirecting, setRedirecting] = useState(true); // 🧠 new flag
 
     const { data: session, status } = useSession();
     const router = useRouter();
@@ -31,8 +32,10 @@ const page = () => {
 
         // Redirect if profile is complete
         if (session.user.isProfileComplete) {
-            return router.push("/dashboard");
+            router.replace("/dashboard"); // use replace() instead of push() ✅
+            return;
         }
+        setRedirecting(false);
     }, [session, status, router]);
     3;
 
@@ -46,10 +49,10 @@ const page = () => {
             });
 
             window.location.href = "/dashboard";
-            return toast.success("✅ Profile completed successfully");
+            toast.success("Profile completed successfully");
         } catch (error) {
-            toast.error("❌ Failed to complete profile", {
-                title: error?.response?.data?.message || "Try again later",
+            toast.error("Failed to complete profile", {
+                description: error?.response?.data?.message || "Try again later",
             });
         } finally {
             setMutating(false);
@@ -62,11 +65,11 @@ const page = () => {
     };
     const isFormValid = fullName.trim().length > 3 && gymCode.trim().length > 0 && username.trim().length > 3;
 
-    if (status === "loading") {
+    if (status === "loading" || redirecting) {
         return <Loading />;
     }
     return (
-        <section className="py-20">
+        <section className="py-20 grow">
             <Container>
                 {/* <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6"> */}
                 <div className="w-full max-w-sm mx-auto">
