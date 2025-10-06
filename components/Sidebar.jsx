@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Sidebar = () => {
     const [isAdmin, setIsAdmin] = useState(null);
+    const [open, setOpen] = useState(false); // 👈 control sheet open state
 
     const { data: session, status } = useSession();
 
@@ -43,7 +44,7 @@ const Sidebar = () => {
     // }
 
     return (
-        <Sheet className="">
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild className="sticky top-0 z-50 bg-background rounded-xl ">
                 <button className="p-2">
                     <AlignJustify size={28} />
@@ -64,7 +65,7 @@ const Sidebar = () => {
                             ({ title, url, Icon, adminOnly }) =>
                                 (!adminOnly || isAdmin) && (
                                     <div key={title} className="px-2 py-1 hover:bg-stone-800 duration-200 ease-in-out rounded-md">
-                                        <Link href={url} className="flex items-center gap-2">
+                                        <Link href={url} className="flex items-center gap-2" onClick={() => setOpen(false)}>
                                             <Icon size={22} />
                                             <span className="text-xl">{title}</span>
                                         </Link>
@@ -74,7 +75,13 @@ const Sidebar = () => {
 
                         {/* Logout */}
                         <div className="px-2 py-1 hover:bg-stone-800 duration-200 ease-in-out rounded-md cursor-pointer">
-                            <div className="flex items-center gap-2" onClick={() => signOut()}>
+                            <div
+                                className="flex items-center gap-2"
+                                onClick={() => {
+                                    signOut();
+                                    setOpen(false);
+                                }}
+                            >
                                 <LogOut size={22} />
                                 <span className="text-xl">Logout</span>
                             </div>

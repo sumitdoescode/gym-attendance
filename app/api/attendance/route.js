@@ -129,6 +129,7 @@ export async function POST(request) {
             hour: "2-digit",
             minute: "2-digit",
             hour12: false,
+            timeZone: "Asia/Kolkata", // ✅ ensure correct local time
         });
 
         const today = new Date();

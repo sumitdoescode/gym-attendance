@@ -53,6 +53,7 @@ export const GET = async (request) => {
                 formattedDate = d.toLocaleDateString("en-US", {
                     month: "long",
                     day: "numeric",
+                    timeZone: "Asia/Kolkata", // ✅ same timezone used here
                 }); // e.g. September 2
             }
 
@@ -64,6 +65,7 @@ export const GET = async (request) => {
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: false,
+                    timeZone: "Asia/Kolkata", // ✅ ensure correct local time
                 }),
             };
         });
