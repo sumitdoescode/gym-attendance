@@ -4,6 +4,7 @@ import Attendance from "@/models/Attendance";
 import User from "@/models/User";
 import Member from "@/models/Member";
 import { auth } from "@/auth";
+import moment from "moment-timezone";
 
 // GET /api/admin/analytics
 // get overall analytics (morning + evening attendance today, last 10 days breakdown, total members)
@@ -29,27 +30,24 @@ export async function GET() {
             return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
         }
 
-        // Base start and end of today
-        const startOfToday = new Date();
-        startOfToday.setHours(0, 0, 0, 0);
+        // Start of today (00:00 IST)
+        const startOfToday = moment().tz("Asia/Kolkata").startOf("day").toDate();
 
-        const endOfToday = new Date();
-        endOfToday.setHours(23, 59, 59, 999);
+        // End of today (23:59:59 IST)
+        const endOfToday = moment().tz("Asia/Kolkata").endOf("day").toDate();
 
-        // Today Morning
+        const morningStart = moment().tz("Asia/Kolkata").startOf("day").hour(5).toDate();
+        const morningEnd = moment().tz("Asia/Kolkata").startOf("day").hour(10).toDate();
+
+        const eveningStart = moment().tz("Asia/Kolkata").startOf("day").hour(17).toDate();
+        const eveningEnd = moment().tz("Asia/Kolkata").startOf("day").hour(22).toDate();
+
         const todayMorning = await Attendance.countDocuments({
-            createdAt: {
-                $gte: new Date(new Date(startOfToday).setHours(5, 0, 0, 0)),
-                $lt: new Date(new Date(startOfToday).setHours(10, 0, 0, 0)),
-            },
+            createdAt: { $gte: morningStart, $lt: morningEnd },
         });
 
-        // Today Evening
         const todayEvening = await Attendance.countDocuments({
-            createdAt: {
-                $gte: new Date(new Date(startOfToday).setHours(17, 0, 0, 0)),
-                $lt: new Date(new Date(startOfToday).setHours(22, 0, 0, 0)),
-            },
+            createdAt: { $gte: eveningStart, $lt: eveningEnd },
         });
 
         // Today Total
